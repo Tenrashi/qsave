@@ -1,0 +1,43 @@
+{
+  "app": {
+    "title": "QSave",
+    "refresh": "Atualizar"
+  },
+  "auth": {
+    "connecting": "Conectando...",
+    "notConnected": "Google Drive não conectado",
+    "connect": "Conectar",
+    "disconnect": "Desconectar",
+    "driveLabel": "Google Drive:"
+  },
+  "search": {
+    "placeholder": "Pesquisar um jogo..."
+  },
+  "games": {
+    "noGamesDetected": "Nenhum jogo detectado",
+    "noGamesHint": "Jogos com arquivos de save serão listados aqui",
+    "scanning": "Procurando saves...",
+    "downloading": "Baixando banco de jogos...",
+    "parsing": "Analisando banco de jogos...",
+    "resolving": "Resolvendo caminhos ({{current}}/{{total}})...",
+    "scanningDisk": "Escaneando disco ({{current}}/{{total}})...",
+    "save_one": "{{count}} save",
+    "save_other": "{{count}} saves",
+    "syncAll": "Sincronizar tudo",
+    "syncToDrive": "Sincronizar ao Drive"
+  },
+  "history": {
+    "title": "Histórico recente"
+  },
+  "status": {
+    "watchingActive": "Monitoramento ativo",
+    "watchingInactive": "Monitoramento inativo",
+    "game_one": "{{count}} jogo",
+    "game_other": "{{count}} jogos",
+    "save_one": "{{count}} save",
+    "save_other": "{{count}} saves"
+  },
+  "settings": {
+    "language": "Idioma"
+  }
+}

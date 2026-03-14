@@ -1,0 +1,43 @@
+{
+  "app": {
+    "title": "QSave",
+    "refresh": "Aggiorna"
+  },
+  "auth": {
+    "connecting": "Connessione...",
+    "notConnected": "Google Drive non connesso",
+    "connect": "Connetti",
+    "disconnect": "Disconnetti",
+    "driveLabel": "Google Drive:"
+  },
+  "search": {
+    "placeholder": "Cerca un gioco..."
+  },
+  "games": {
+    "noGamesDetected": "Nessun gioco rilevato",
+    "noGamesHint": "I giochi con file di salvataggio appariranno qui",
+    "scanning": "Scansione dei salvataggi...",
+    "downloading": "Download del database giochi...",
+    "parsing": "Analisi del database giochi...",
+    "resolving": "Risoluzione dei percorsi ({{current}}/{{total}})...",
+    "scanningDisk": "Scansione del disco ({{current}}/{{total}})...",
+    "save_one": "{{count}} salvataggio",
+    "save_other": "{{count}} salvataggi",
+    "syncAll": "Sincronizza tutto",
+    "syncToDrive": "Sincronizza su Drive"
+  },
+  "history": {
+    "title": "Cronologia recente"
+  },
+  "status": {
+    "watchingActive": "Monitoraggio attivo",
+    "watchingInactive": "Monitoraggio inattivo",
+    "game_one": "{{count}} gioco",
+    "game_other": "{{count}} giochi",
+    "save_one": "{{count}} salvataggio",
+    "save_other": "{{count}} salvataggi"
+  },
+  "settings": {
+    "language": "Lingua"
+  }
+}

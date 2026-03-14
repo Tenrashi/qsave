@@ -1,0 +1,32 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "QSave default capabilities",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "fs:default",
+    "fs:allow-watch",
+    "store:default",
+    "notification:default",
+    "notification:allow-notify",
+    "notification:allow-request-permission",
+    "notification:allow-is-permission-granted",
+    "shell:allow-open",
+    "autostart:default",
+    {
+      "identifier": "http:default",
+      "allow": [
+        { "url": "https://accounts.google.com/**" },
+        { "url": "https://oauth2.googleapis.com/**" },
+        { "url": "https://www.googleapis.com/**" }
+      ]
+    },
+    {
+      "identifier": "fs:allow-read-file",
+      "allow": [
+        { "path": "$HOME/**" }
+      ]
+    }
+  ]
+}

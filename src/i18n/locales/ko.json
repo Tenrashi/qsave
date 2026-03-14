@@ -1,0 +1,43 @@
+{
+  "app": {
+    "title": "QSave",
+    "refresh": "새로고침"
+  },
+  "auth": {
+    "connecting": "연결 중...",
+    "notConnected": "Google Drive에 연결되지 않음",
+    "connect": "연결",
+    "disconnect": "연결 해제",
+    "driveLabel": "Google Drive:"
+  },
+  "search": {
+    "placeholder": "게임 검색..."
+  },
+  "games": {
+    "noGamesDetected": "감지된 게임 없음",
+    "noGamesHint": "세이브 파일이 있는 게임이 여기에 표시됩니다",
+    "scanning": "세이브 데이터 스캔 중...",
+    "downloading": "게임 데이터베이스 다운로드 중...",
+    "parsing": "게임 데이터베이스 분석 중...",
+    "resolving": "세이브 경로 확인 중 ({{current}}/{{total}})...",
+    "scanningDisk": "디스크 스캔 중 ({{current}}/{{total}})...",
+    "save_one": "세이브 {{count}}개",
+    "save_other": "세이브 {{count}}개",
+    "syncAll": "전체 동기화",
+    "syncToDrive": "Drive에 동기화"
+  },
+  "history": {
+    "title": "최근 기록"
+  },
+  "status": {
+    "watchingActive": "감시 중",
+    "watchingInactive": "감시 중지",
+    "game_one": "게임 {{count}}개",
+    "game_other": "게임 {{count}}개",
+    "save_one": "세이브 {{count}}개",
+    "save_other": "세이브 {{count}}개"
+  },
+  "settings": {
+    "language": "언어"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "app": {
+    "title": "QSave",
+    "refresh": "Обновить"
+  },
+  "auth": {
+    "connecting": "Подключение...",
+    "notConnected": "Google Drive не подключён",
+    "connect": "Подключить",
+    "disconnect": "Отключить",
+    "driveLabel": "Google Drive:"
+  },
+  "search": {
+    "placeholder": "Поиск игры..."
+  },
+  "games": {
+    "noGamesDetected": "Игры не обнаружены",
+    "noGamesHint": "Игры с файлами сохранений будут отображены здесь",
+    "scanning": "Поиск сохранений...",
+    "downloading": "Загрузка базы игр...",
+    "parsing": "Анализ базы игр...",
+    "resolving": "Разрешение путей ({{current}}/{{total}})...",
+    "scanningDisk": "Сканирование диска ({{current}}/{{total}})...",
+    "save_one": "{{count}} сохранение",
+    "save_few": "{{count}} сохранения",
+    "save_many": "{{count}} сохранений",
+    "syncAll": "Синхронизировать всё",
+    "syncToDrive": "Синхронизировать в Drive"
+  },
+  "history": {
+    "title": "Недавняя история"
+  },
+  "status": {
+    "watchingActive": "Мониторинг активен",
+    "watchingInactive": "Мониторинг неактивен",
+    "game_one": "{{count}} игра",
+    "game_few": "{{count}} игры",
+    "game_many": "{{count}} игр",
+    "save_one": "{{count}} сохранение",
+    "save_few": "{{count}} сохранения",
+    "save_many": "{{count}} сохранений"
+  },
+  "settings": {
+    "language": "Язык"
+  }
+}

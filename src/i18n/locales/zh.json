@@ -1,0 +1,43 @@
+{
+  "app": {
+    "title": "QSave",
+    "refresh": "刷新"
+  },
+  "auth": {
+    "connecting": "连接中...",
+    "notConnected": "Google Drive 未连接",
+    "connect": "连接",
+    "disconnect": "断开",
+    "driveLabel": "Google Drive："
+  },
+  "search": {
+    "placeholder": "搜索游戏..."
+  },
+  "games": {
+    "noGamesDetected": "未检测到游戏",
+    "noGamesHint": "有存档文件的游戏将显示在这里",
+    "scanning": "正在扫描存档...",
+    "downloading": "正在下载游戏数据库...",
+    "parsing": "正在解析游戏数据库...",
+    "resolving": "正在解析存档路径 ({{current}}/{{total}})...",
+    "scanningDisk": "正在扫描磁盘 ({{current}}/{{total}})...",
+    "save_one": "{{count}}个存档",
+    "save_other": "{{count}}个存档",
+    "syncAll": "全部同步",
+    "syncToDrive": "同步到Drive"
+  },
+  "history": {
+    "title": "最近记录"
+  },
+  "status": {
+    "watchingActive": "监控中",
+    "watchingInactive": "监控已停止",
+    "game_one": "{{count}}个游戏",
+    "game_other": "{{count}}个游戏",
+    "save_one": "{{count}}个存档",
+    "save_other": "{{count}}个存档"
+  },
+  "settings": {
+    "language": "语言"
+  }
+}

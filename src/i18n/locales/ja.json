@@ -1,0 +1,43 @@
+{
+  "app": {
+    "title": "QSave",
+    "refresh": "更新"
+  },
+  "auth": {
+    "connecting": "接続中...",
+    "notConnected": "Google Driveに未接続",
+    "connect": "接続",
+    "disconnect": "切断",
+    "driveLabel": "Google Drive："
+  },
+  "search": {
+    "placeholder": "ゲームを検索..."
+  },
+  "games": {
+    "noGamesDetected": "ゲームが検出されませんでした",
+    "noGamesHint": "セーブファイルのあるゲームがここに表示されます",
+    "scanning": "セーブデータをスキャン中...",
+    "downloading": "ゲームデータベースをダウンロード中...",
+    "parsing": "ゲームデータベースを解析中...",
+    "resolving": "セーブパスを解決中 ({{current}}/{{total}})...",
+    "scanningDisk": "ディスクをスキャン中 ({{current}}/{{total}})...",
+    "save_one": "{{count}}件のセーブ",
+    "save_other": "{{count}}件のセーブ",
+    "syncAll": "すべて同期",
+    "syncToDrive": "Driveに同期"
+  },
+  "history": {
+    "title": "最近の履歴"
+  },
+  "status": {
+    "watchingActive": "監視中",
+    "watchingInactive": "監視停止中",
+    "game_one": "{{count}}ゲーム",
+    "game_other": "{{count}}ゲーム",
+    "save_one": "{{count}}セーブ",
+    "save_other": "{{count}}セーブ"
+  },
+  "settings": {
+    "language": "言語"
+  }
+}
