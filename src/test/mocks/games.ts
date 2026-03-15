@@ -36,6 +36,7 @@ export const eldenRingSave1: SaveFile = {
 
 export const sims4Game: Game = {
   name: "The Sims 4",
+  steamId: 1222670,
   savePaths: ["/saves/sims4"],
   saveFiles: [sims4Save1, sims4Save2],
 };

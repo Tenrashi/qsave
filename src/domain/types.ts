@@ -1,5 +1,6 @@
 export type Game = {
   name: string;
+  steamId?: number;
   savePaths: string[];
   saveFiles: SaveFile[];
 };

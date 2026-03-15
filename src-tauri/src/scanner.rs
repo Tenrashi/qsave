@@ -6,8 +6,14 @@ use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
 #[derive(Debug, Deserialize)]
+struct SteamInfo {
+    id: Option<u64>,
+}
+
+#[derive(Debug, Deserialize)]
 struct ManifestEntry {
     files: Option<HashMap<String, serde_yaml::Value>>,
+    steam: Option<SteamInfo>,
     #[allow(dead_code)]
     #[serde(flatten)]
     _rest: HashMap<String, serde_yaml::Value>,
@@ -17,6 +23,7 @@ struct ManifestEntry {
 #[serde(rename_all = "camelCase")]
 pub struct DetectedGame {
     pub name: String,
+    pub steam_id: Option<u64>,
     pub save_paths: Vec<String>,
     pub save_files: Vec<SaveFileInfo>,
 }
@@ -161,10 +168,11 @@ pub fn scan_games_blocking() -> Result<Vec<DetectedGame>, String> {
     let username = get_username();
 
     // 3. Resolve paths (single-threaded, fast — just string ops)
-    let candidates: Vec<(String, Vec<String>)> = manifest
+    let candidates: Vec<(String, Option<u64>, Vec<String>)> = manifest
         .into_iter()
         .filter_map(|(name, entry)| {
             let files = entry.files?;
+            let steam_id = entry.steam.and_then(|s| s.id);
             let mut paths: Vec<String> = Vec::new();
 
             for raw_path in files.keys() {
@@ -178,7 +186,7 @@ pub fn scan_games_blocking() -> Result<Vec<DetectedGame>, String> {
             if paths.is_empty() {
                 None
             } else {
-                Some((name, paths))
+                Some((name, steam_id, paths))
             }
         })
         .collect();
@@ -186,7 +194,7 @@ pub fn scan_games_blocking() -> Result<Vec<DetectedGame>, String> {
     // 4. Scan disk in parallel with Rayon
     let mut games: Vec<DetectedGame> = candidates
         .into_par_iter()
-        .filter_map(|(name, paths)| {
+        .filter_map(|(name, steam_id, paths)| {
             let mut valid_paths = Vec::new();
             let mut save_files = Vec::new();
 
@@ -203,6 +211,7 @@ pub fn scan_games_blocking() -> Result<Vec<DetectedGame>, String> {
             } else {
                 Some(DetectedGame {
                     name,
+                    steam_id,
                     save_paths: valid_paths,
                     save_files,
                 })

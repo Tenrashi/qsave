@@ -11,6 +11,7 @@ type RustSaveFile = {
 
 type RustDetectedGame = {
   name: string;
+  steamId: number | null;
   savePaths: string[];
   saveFiles: RustSaveFile[];
 };
@@ -20,6 +21,7 @@ export async function scanForGames(): Promise<Game[]> {
 
   return results.map((game) => ({
     name: game.name,
+    steamId: game.steamId ?? undefined,
     savePaths: game.savePaths,
     saveFiles: game.saveFiles.map(
       (f): SaveFile => ({

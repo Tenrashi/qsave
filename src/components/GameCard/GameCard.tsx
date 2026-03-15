@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
-import { Upload, CheckCircle, AlertCircle, Loader2, Gamepad2, FolderOpen } from "lucide-react";
+import { Upload, CheckCircle, AlertCircle, Loader2, FolderOpen } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { useSyncStore } from "@/stores/sync";
 import type { Game, SyncStatus } from "@/domain/types";
 import { syncGame } from "@/services/sync";
 import { dateFnsLocales } from "@/lib/date-locales";
+import { GameBanner } from "./GameBanner/GameBanner";
 import { formatSize } from "./utils/formatSize";
 
 const SyncStatusIcon = ({ status }: { status: SyncStatus }) => {
@@ -26,6 +27,9 @@ const SyncStatusIcon = ({ status }: { status: SyncStatus }) => {
   }
 };
 
+const steamHeaderUrl = (steamId: number) =>
+  `https://cdn.cloudflare.steamstatic.com/steam/apps/${steamId}/header.jpg`;
+
 export type GameCardProps = {
   game: Game;
 };
@@ -36,7 +40,6 @@ export const GameCard = memo(({ game }: GameCardProps) => {
   const { auth } = useAuthStore();
   const { gameStatuses, setGameStatus } = useSyncStore();
   const locale = dateFnsLocales[i18n.language] ?? enUS;
-
   const status = gameStatuses[game.name] ?? "idle";
   const isSyncing = status === "syncing";
 
@@ -59,35 +62,37 @@ export const GameCard = memo(({ game }: GameCardProps) => {
   };
 
   return (
-    <Card>
-      <div className="flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <Gamepad2 className="w-4 h-4 text-muted-foreground shrink-0" />
-          <span className="font-medium truncate">{game.name}</span>
-          <SyncStatusIcon status={status} />
-        </div>
-        <div className="flex items-center gap-3 shrink-0 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1.5">
-            <FolderOpen className="w-3 h-3" />
-            <span>{formatSize(totalSize)}</span>
+    <Card className="overflow-hidden !py-0">
+      <div className="flex items-center h-14">
+        <GameBanner steamId={game.steamId} />
+        <div className="flex items-center justify-between flex-1 min-w-0 pl-2 pr-4">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <span className="font-medium truncate">{game.name}</span>
+            <SyncStatusIcon status={status} />
           </div>
-          <span>{formatDistanceToNow(lastModified, { addSuffix: true, locale })}</span>
-          {auth.isAuthenticated && (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={handleSync}
-              disabled={isSyncing}
-              className="ml-1"
-            >
-              {isSyncing ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
-              ) : (
-                <Upload className="w-3.5 h-3.5 mr-1.5" />
-              )}
-              {t("games.sync")}
-            </Button>
-          )}
+          <div className="flex items-center gap-3 shrink-0 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5">
+              <FolderOpen className="w-3 h-3" />
+              <span>{formatSize(totalSize)}</span>
+            </div>
+            <span>{formatDistanceToNow(lastModified, { addSuffix: true, locale })}</span>
+            {auth.isAuthenticated && (
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={handleSync}
+                disabled={isSyncing}
+                className="ml-1"
+              >
+                {isSyncing ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                ) : (
+                  <Upload className="w-3.5 h-3.5 mr-1.5" />
+                )}
+                {t("games.sync")}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </Card>
