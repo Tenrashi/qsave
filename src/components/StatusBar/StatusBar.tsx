@@ -1,24 +1,26 @@
 import { useTranslation } from "react-i18next";
-import { Eye, Gamepad2 } from "lucide-react";
+import { Eye, EyeOff, Gamepad2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import type { Game } from "@/domain/types";
 
 export type StatusBarProps = {
   games: Game[];
-  watchedCount: number;
+  watching: boolean;
+  onToggleWatching: () => void;
 };
 
-export const StatusBar = ({ games, watchedCount }: StatusBarProps) => {
+export const StatusBar = ({ games, watching, onToggleWatching }: StatusBarProps) => {
   const { t } = useTranslation();
 
   return (
     <div className="flex items-center gap-3 px-4 py-2 border-t text-xs text-muted-foreground">
-      <div className="flex items-center gap-1.5">
-        <Eye className="w-3 h-3" />
-        <span>
-          {watchedCount > 0 ? t("status.watchingActive") : t("status.watchingInactive")}
-        </span>
-      </div>
+      <button
+        onClick={onToggleWatching}
+        className="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-pointer"
+      >
+        {watching ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+        <span>{watching ? t("status.watchingActive") : t("status.watchingInactive")}</span>
+      </button>
       <Separator orientation="vertical" className="h-3" />
       <div className="flex items-center gap-1.5">
         <Gamepad2 className="w-3 h-3" />

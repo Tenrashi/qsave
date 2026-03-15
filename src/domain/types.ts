@@ -38,3 +38,8 @@ export type GameSyncState = {
   gameName: string;
   status: SyncStatus;
 };
+
+export type GameSyncFingerprint = {
+  hash: string;
+  syncedAt: string;
+};

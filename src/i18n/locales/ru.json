@@ -21,7 +21,9 @@
     "parsing": "Анализ базы игр...",
     "resolving": "Разрешение путей ({{current}}/{{total}})...",
     "scanningDisk": "Сканирование диска ({{current}}/{{total}})...",
-    "sync": "Синхронизировать"
+    "sync": "Синхронизировать",
+    "watchTooltip": "Включить автосинхронизацию",
+    "unwatchTooltip": "Отключить автосинхронизацию"
   },
   "history": {
     "title": "Недавняя история"
@@ -32,6 +34,10 @@
     "game_one": "{{count}} игра",
     "game_few": "{{count}} игры",
     "game_many": "{{count}} игр"
+  },
+  "notifications": {
+    "gameDetectedOne": "{{name}} обнаружена",
+    "gameDetectedOther": "Обнаружено {{count}} новых игр"
   },
   "settings": {
     "language": "Язык"

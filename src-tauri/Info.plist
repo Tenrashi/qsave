@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>QSave needs to access your Documents folder to detect game save files.</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>QSave needs to access your Desktop folder to detect game save files.</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>QSave needs to access your Downloads folder to detect game save files.</string>
+</dict>
+</plist>

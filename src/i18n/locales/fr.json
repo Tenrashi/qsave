@@ -21,7 +21,9 @@
     "parsing": "Analyse de la base de jeux...",
     "resolving": "Résolution des chemins ({{current}}/{{total}})...",
     "scanningDisk": "Scan du disque ({{current}}/{{total}})...",
-    "sync": "Synchroniser"
+    "sync": "Synchroniser",
+    "watchTooltip": "Activer la synchro auto",
+    "unwatchTooltip": "Désactiver la synchro auto"
   },
   "history": {
     "title": "Historique récent"
@@ -31,6 +33,10 @@
     "watchingInactive": "Surveillance inactive",
     "game_one": "{{count}} jeu",
     "game_other": "{{count}} jeux"
+  },
+  "notifications": {
+    "gameDetectedOne": "{{name}} détecté",
+    "gameDetectedOther": "{{count}} nouveaux jeux détectés"
   },
   "settings": {
     "language": "Langue"

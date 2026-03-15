@@ -14,7 +14,7 @@ const renderSearchBar = (overrides: Partial<SearchBarProps> = {}) => {
 describe("SearchBar", () => {
   it("renders with placeholder", () => {
     renderSearchBar();
-    expect(screen.getByPlaceholderText("Search for a game...")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("search.placeholder")).toBeInTheDocument();
   });
 
   it("displays the current value", () => {
@@ -27,7 +27,7 @@ describe("SearchBar", () => {
     const user = userEvent.setup();
     renderSearchBar({ onChange });
 
-    await user.type(screen.getByPlaceholderText("Search for a game..."), "a");
+    await user.type(screen.getByPlaceholderText("search.placeholder"), "a");
     expect(onChange).toHaveBeenCalledWith("a");
   });
 });

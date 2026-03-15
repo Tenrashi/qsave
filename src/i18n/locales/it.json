@@ -21,7 +21,9 @@
     "parsing": "Analisi del database giochi...",
     "resolving": "Risoluzione dei percorsi ({{current}}/{{total}})...",
     "scanningDisk": "Scansione del disco ({{current}}/{{total}})...",
-    "sync": "Sincronizza"
+    "sync": "Sincronizza",
+    "watchTooltip": "Attiva sincronizzazione automatica",
+    "unwatchTooltip": "Disattiva sincronizzazione automatica"
   },
   "history": {
     "title": "Cronologia recente"
@@ -31,6 +33,10 @@
     "watchingInactive": "Monitoraggio inattivo",
     "game_one": "{{count}} gioco",
     "game_other": "{{count}} giochi"
+  },
+  "notifications": {
+    "gameDetectedOne": "{{name}} rilevato",
+    "gameDetectedOther": "{{count}} nuovi giochi rilevati"
   },
   "settings": {
     "language": "Lingua"

@@ -1,28 +1,29 @@
-import { open } from "@tauri-apps/plugin-shell";
+import { invoke } from "@tauri-apps/api/core";
 import { fetch } from "@tauri-apps/plugin-http";
 import type { AuthState } from "@/domain/types";
 import { getAuthState, setAuthState, clearAuth } from "@/lib/store";
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = import.meta.env.VITE_GOOGLE_CLIENT_SECRET;
-const REDIRECT_URI = "http://localhost:8765/callback";
-const SCOPES = "https://www.googleapis.com/auth/drive.file";
+const SCOPES = "https://www.googleapis.com/auth/drive.file email";
 
 export const startOAuthFlow = async (): Promise<AuthState> => {
+  const redirectUri: string = await invoke("get_oauth_redirect_uri");
+
   const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
   authUrl.searchParams.set("client_id", CLIENT_ID);
-  authUrl.searchParams.set("redirect_uri", REDIRECT_URI);
+  authUrl.searchParams.set("redirect_uri", redirectUri);
   authUrl.searchParams.set("response_type", "code");
   authUrl.searchParams.set("scope", SCOPES);
   authUrl.searchParams.set("access_type", "offline");
   authUrl.searchParams.set("prompt", "consent");
 
-  await open(authUrl.toString());
-
-  return getAuthState();
+  const code: string = await invoke("start_oauth", { authUrl: authUrl.toString() });
+  return exchangeCodeForTokens(code, redirectUri);
 };
 
-export const exchangeCodeForTokens = async (code: string): Promise<AuthState> => {
+export const exchangeCodeForTokens = async (code: string, redirectUri?: string): Promise<AuthState> => {
+  const uri = redirectUri ?? (await invoke<string>("get_oauth_redirect_uri"));
   const res = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -30,7 +31,7 @@ export const exchangeCodeForTokens = async (code: string): Promise<AuthState> =>
       code,
       client_id: CLIENT_ID,
       client_secret: CLIENT_SECRET,
-      redirect_uri: REDIRECT_URI,
+      redirect_uri: uri,
       grant_type: "authorization_code",
     }).toString(),
   });

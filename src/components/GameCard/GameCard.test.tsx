@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderWithProviders, screen } from "@/test/test-utils";
+import userEvent from "@testing-library/user-event";
 import { useAuthStore } from "@/stores/auth";
+import { useSyncStore } from "@/stores/sync";
 import { sims4Game, eldenRingGame } from "@/test/mocks/games";
+import { computeGameHash } from "@/lib/hash";
 import { GameCard, type GameCardProps } from "./GameCard";
 
 vi.mock("./utils/formatSize", () => ({
@@ -12,38 +15,91 @@ const defaultProps: GameCardProps = {
   game: sims4Game,
 };
 
-const renderGameCard = (overrides: Partial<GameCardProps> = {}) => {
-  return renderWithProviders(<GameCard {...defaultProps} {...overrides} />);
+const renderGameCard = (overrides: Partial<GameCardProps> = {}) =>
+  renderWithProviders(<GameCard {...defaultProps} {...overrides} />);
+
+const authenticateUser = () => {
+  useAuthStore.setState({
+    auth: { isAuthenticated: true, email: "test@gmail.com" },
+    loading: false,
+  });
 };
 
 describe("GameCard", () => {
   beforeEach(() => {
     useAuthStore.setState({ auth: { isAuthenticated: false }, loading: false });
+    useSyncStore.setState({
+      gameStatuses: {},
+      watchedGames: {},
+      syncFingerprints: {},
+    });
   });
 
   it("renders game name and aggregated size", () => {
     renderGameCard();
     expect(screen.getByText("The Sims 4")).toBeInTheDocument();
-    // 12_582_912 + 8_388_608 = 20_971_520
     expect(screen.getByText("20971520 bytes")).toBeInTheDocument();
   });
 
   it("does not show sync button when not authenticated", () => {
     renderGameCard();
-    expect(screen.queryByText("Sync")).not.toBeInTheDocument();
+    expect(screen.queryByText("games.sync")).not.toBeInTheDocument();
   });
 
   it("shows sync button when authenticated", () => {
-    useAuthStore.setState({
-      auth: { isAuthenticated: true, email: "test@gmail.com" },
-      loading: false,
-    });
+    authenticateUser();
     renderGameCard();
-    expect(screen.getByText("Sync")).toBeInTheDocument();
+    expect(screen.getByText("games.sync")).toBeInTheDocument();
   });
 
   it("renders with custom game", () => {
     renderGameCard({ game: eldenRingGame });
     expect(screen.getByText("Elden Ring")).toBeInTheDocument();
+  });
+
+  it("shows watch toggle when authenticated", () => {
+    authenticateUser();
+    renderGameCard();
+    expect(screen.getByRole("button", { name: /games\.watchTooltip|games\.unwatchTooltip/ })).toBeInTheDocument();
+  });
+
+  it("does not show watch toggle when not authenticated", () => {
+    renderGameCard();
+    expect(screen.queryByRole("button", { name: /games\.watchTooltip|games\.unwatchTooltip/ })).not.toBeInTheDocument();
+  });
+
+  it("toggles watch state when clicking the eye icon", async () => {
+    authenticateUser();
+    renderGameCard();
+
+    const toggle = screen.getByRole("button", { name: /games\.watchTooltip|games\.unwatchTooltip/ });
+    await userEvent.click(toggle);
+
+    expect(useSyncStore.getState().watchedGames["The Sims 4"]).toBe(true);
+  });
+
+  it("shows green checkmark when game is synced", () => {
+    authenticateUser();
+    const hash = computeGameHash(sims4Game.saveFiles);
+    useSyncStore.setState({
+      syncFingerprints: {
+        "The Sims 4": { hash, syncedAt: new Date().toISOString() },
+      },
+    });
+
+    const { container } = renderGameCard();
+    expect(container.querySelector(".text-green-500")).toBeInTheDocument();
+  });
+
+  it("does not show checkmark when game has unsynced changes", () => {
+    authenticateUser();
+    useSyncStore.setState({
+      syncFingerprints: {
+        "The Sims 4": { hash: "stale-hash", syncedAt: new Date().toISOString() },
+      },
+    });
+
+    const { container } = renderGameCard();
+    expect(container.querySelector(".text-green-500")).not.toBeInTheDocument();
   });
 });

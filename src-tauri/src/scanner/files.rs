@@ -3,6 +3,7 @@ use std::fs;
 use std::path::Path;
 use std::time::SystemTime;
 
+use super::localized_paths::try_localized_path;
 use super::types::{DetectedGame, SaveFileInfo};
 
 pub fn collect_save_files(dir: &Path, game_name: &str) -> Vec<SaveFileInfo> {
@@ -51,7 +52,7 @@ pub fn scan_candidates(candidates: Vec<(String, Option<u64>, Vec<String>)>) -> V
         .filter_map(|(name, steam_id, paths)| {
             let existing: Vec<_> = paths
                 .into_iter()
-                .filter(|p| Path::new(p).exists())
+                .filter_map(|p| try_localized_path(&p))
                 .collect();
 
             let save_files: Vec<_> = existing

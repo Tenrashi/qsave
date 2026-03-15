@@ -21,7 +21,9 @@
     "parsing": "Spieldatenbank wird analysiert...",
     "resolving": "Pfade werden aufgelöst ({{current}}/{{total}})...",
     "scanningDisk": "Festplatte wird gescannt ({{current}}/{{total}})...",
-    "sync": "Synchronisieren"
+    "sync": "Synchronisieren",
+    "watchTooltip": "Auto-Sync aktivieren",
+    "unwatchTooltip": "Auto-Sync deaktivieren"
   },
   "history": {
     "title": "Verlauf"
@@ -31,6 +33,10 @@
     "watchingInactive": "Überwachung inaktiv",
     "game_one": "{{count}} Spiel",
     "game_other": "{{count}} Spiele"
+  },
+  "notifications": {
+    "gameDetectedOne": "{{name}} erkannt",
+    "gameDetectedOther": "{{count}} neue Spiele erkannt"
   },
   "settings": {
     "language": "Sprache"

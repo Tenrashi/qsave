@@ -3,35 +3,39 @@ import { useTranslation } from "react-i18next";
 import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { useAuthStore } from "@/stores/auth";
+import { useSyncStore } from "@/stores/sync";
 import { useGames } from "@/hooks/useGames";
 import { useSyncHistory } from "@/hooks/useSyncHistory";
+import { useAutoSync } from "@/hooks/useAutoSync";
+import { useGameDetectionNotify } from "@/hooks/useGameDetectionNotify";
 import { AuthStatus } from "@/components/AuthStatus/AuthStatus";
 import { SearchBar } from "@/components/SearchBar/SearchBar";
 import { SavesList } from "@/components/SavesList/SavesList";
 import { SyncHistory } from "@/components/SyncHistory/SyncHistory";
 import { StatusBar } from "@/components/StatusBar/StatusBar";
 import { LanguageSelector } from "@/components/LanguageSelector/LanguageSelector";
-import { startWatching, stopWatching } from "@/lib/watcher";
+
 
 const App = () => {
   const { t } = useTranslation();
   const { init } = useAuthStore();
+  const { initWatchPreferences, initSyncFingerprints } = useSyncStore();
   const games = useGames();
   const history = useSyncHistory();
   const [search, setSearch] = useState("");
+  const [watching, setWatching] = useState(true);
   const deferredSearch = useDeferredValue(search);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { init(); }, [init]);
-
   useEffect(() => {
-    if (!games.data?.length) return;
-    const dirs = games.data.flatMap((g) => g.savePaths);
-    startWatching(dirs, () => games.refetch());
-    return () => { stopWatching(); };
-  }, [games.data]);
+    init();
+    initWatchPreferences();
+    initSyncFingerprints();
+  }, []);
+
+  useAutoSync(games.data, watching, () => games.refetch());
+  useGameDetectionNotify(games.data);
 
   const filteredGames = useMemo(() => {
     if (!games.data) return [];
@@ -92,7 +96,11 @@ const App = () => {
         </div>
       )}
 
-      <StatusBar games={games.data ?? []} watchedCount={games.data?.length ?? 0} />
+      <StatusBar
+        games={games.data ?? []}
+        watching={watching}
+        onToggleWatching={() => setWatching((prev) => !prev)}
+      />
     </div>
   );
 };

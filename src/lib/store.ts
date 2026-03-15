@@ -1,5 +1,5 @@
 import { load, type Store } from "@tauri-apps/plugin-store";
-import type { AuthState, SyncRecord } from "@/domain/types";
+import type { AuthState, SyncRecord, GameSyncFingerprint } from "@/domain/types";
 
 let store: Store | null = null;
 
@@ -55,4 +55,28 @@ export async function setDriveFolderId(gameName: string, folderId: string): Prom
   const folders = (await s.get<Record<string, string>>("driveFolders")) ?? {};
   folders[gameName] = folderId;
   await s.set("driveFolders", folders);
+}
+
+// Watched games
+export async function getWatchedGames(): Promise<string[]> {
+  const s = await getStore();
+  return (await s.get<string[]>("watchedGames")) ?? [];
+}
+
+export async function setWatchedGames(names: string[]): Promise<void> {
+  const s = await getStore();
+  await s.set("watchedGames", names);
+}
+
+// Sync fingerprints
+export async function getSyncFingerprints(): Promise<Record<string, GameSyncFingerprint>> {
+  const s = await getStore();
+  return (await s.get<Record<string, GameSyncFingerprint>>("syncFingerprints")) ?? {};
+}
+
+export async function setSyncFingerprint(gameName: string, fingerprint: GameSyncFingerprint): Promise<void> {
+  const s = await getStore();
+  const all = (await s.get<Record<string, GameSyncFingerprint>>("syncFingerprints")) ?? {};
+  all[gameName] = fingerprint;
+  await s.set("syncFingerprints", all);
 }

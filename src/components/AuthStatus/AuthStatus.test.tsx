@@ -10,14 +10,14 @@ describe("AuthStatus", () => {
 
   it("shows connect button when not authenticated", () => {
     renderWithProviders(<AuthStatus />);
-    expect(screen.getByText("Connect")).toBeInTheDocument();
-    expect(screen.getByText("Google Drive not connected")).toBeInTheDocument();
+    expect(screen.getByText("auth.connect")).toBeInTheDocument();
+    expect(screen.getByText("auth.notConnected")).toBeInTheDocument();
   });
 
   it("shows loading state", () => {
     useAuthStore.setState({ loading: true });
     renderWithProviders(<AuthStatus />);
-    expect(screen.getByText("Connecting...")).toBeInTheDocument();
+    expect(screen.getByText("auth.connecting")).toBeInTheDocument();
   });
 
   it("shows email and disconnect when authenticated", () => {
@@ -27,6 +27,6 @@ describe("AuthStatus", () => {
     });
     renderWithProviders(<AuthStatus />);
     expect(screen.getByText("user@gmail.com")).toBeInTheDocument();
-    expect(screen.getByText("Disconnect")).toBeInTheDocument();
+    expect(screen.getByText("auth.disconnect")).toBeInTheDocument();
   });
 });

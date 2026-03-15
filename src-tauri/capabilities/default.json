@@ -6,7 +6,13 @@
   "permissions": [
     "core:default",
     "fs:default",
-    "fs:allow-watch",
+    {
+      "identifier": "fs:allow-watch",
+      "allow": [
+        { "path": "$HOME/**" }
+      ]
+    },
+    "fs:allow-unwatch",
     "store:default",
     "notification:default",
     "notification:allow-notify",
