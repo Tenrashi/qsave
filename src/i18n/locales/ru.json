@@ -1,6 +1,8 @@
 {
   "app": {
     "title": "QSave",
+    "successIcon": "Синхронизация успешна",
+    "errorIcon": "Ошибка синхронизации"
     "refresh": "Обновить"
   },
   "auth": {
@@ -21,10 +23,14 @@
     "parsing": "Анализ базы игр...",
     "resolving": "Разрешение путей ({{current}}/{{total}})...",
     "scanningDisk": "Сканирование диска ({{current}}/{{total}})...",
-    "sync": "Синхронизировать"
+    "sync": "Синхронизировать",
+    "watchTooltip": "Включить автосинхронизацию",
+    "unwatchTooltip": "Отключить автосинхронизацию"
   },
   "history": {
-    "title": "Недавняя история"
+    "title": "Недавняя история",
+    "successIcon": "Синхронизация успешна",
+    "errorIcon": "Ошибка синхронизации"
   },
   "status": {
     "watchingActive": "Мониторинг активен",
@@ -32,6 +38,10 @@
     "game_one": "{{count}} игра",
     "game_few": "{{count}} игры",
     "game_many": "{{count}} игр"
+  },
+  "notifications": {
+    "gameDetectedOne": "{{name}} обнаружена",
+    "gameDetectedOther": "Обнаружено {{count}} новых игр"
   },
   "settings": {
     "language": "Язык"

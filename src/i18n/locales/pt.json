@@ -1,6 +1,8 @@
 {
   "app": {
     "title": "QSave",
+    "successIcon": "Sincronização bem-sucedida",
+    "errorIcon": "Falha na sincronização"
     "refresh": "Atualizar"
   },
   "auth": {
@@ -21,16 +23,24 @@
     "parsing": "Analisando banco de jogos...",
     "resolving": "Resolvendo caminhos ({{current}}/{{total}})...",
     "scanningDisk": "Escaneando disco ({{current}}/{{total}})...",
-    "sync": "Sincronizar"
+    "sync": "Sincronizar",
+    "watchTooltip": "Ativar sincronização automática",
+    "unwatchTooltip": "Desativar sincronização automática"
   },
   "history": {
-    "title": "Histórico recente"
+    "title": "Histórico recente",
+    "successIcon": "Sincronização bem-sucedida",
+    "errorIcon": "Falha na sincronização"
   },
   "status": {
     "watchingActive": "Monitoramento ativo",
     "watchingInactive": "Monitoramento inativo",
     "game_one": "{{count}} jogo",
     "game_other": "{{count}} jogos"
+  },
+  "notifications": {
+    "gameDetectedOne": "{{name}} detectado",
+    "gameDetectedOther": "{{count}} novos jogos detectados"
   },
   "settings": {
     "language": "Idioma"

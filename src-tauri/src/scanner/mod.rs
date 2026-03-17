@@ -1,4 +1,6 @@
 mod files;
+mod localized_names;
+mod localized_paths;
 mod manifest;
 mod resolve;
 mod types;

@@ -21,16 +21,24 @@
     "parsing": "Parsing game database...",
     "resolving": "Resolving save paths ({{current}}/{{total}})...",
     "scanningDisk": "Scanning disk ({{current}}/{{total}})...",
-    "sync": "Sync"
+    "sync": "Sync",
+    "watchTooltip": "Enable auto-sync",
+    "unwatchTooltip": "Disable auto-sync"
   },
   "history": {
-    "title": "Recent history"
+    "title": "Recent history",
+    "successIcon": "Sync successful",
+    "errorIcon": "Sync failed"
   },
   "status": {
     "watchingActive": "Watching active",
     "watchingInactive": "Watching inactive",
     "game_one": "{{count}} game",
     "game_other": "{{count}} games"
+  },
+  "notifications": {
+    "gameDetectedOne": "{{name}} detected",
+    "gameDetectedOther": "{{count}} new games detected"
   },
   "settings": {
     "language": "Language"

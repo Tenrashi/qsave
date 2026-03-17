@@ -3,7 +3,8 @@ import { CheckCircle, AlertCircle, History } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { RECORD_STATUS } from "@/domain/types";
 import { useSyncHistory } from "@/hooks/useSyncHistory";
 import { dateFnsLocales } from "@/lib/date-locales";
 import { MAX_RECENT_ENTRIES } from "./SyncHistory.const";
@@ -25,28 +26,23 @@ export const SyncHistory = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="space-y-1">
-          {recent.map((record) => (
-            <div key={record.id} className="flex items-center gap-3 py-1.5 text-sm">
-              {record.status === "success" ? (
-                <CheckCircle className="w-3.5 h-3.5 text-green-500 shrink-0" />
-              ) : (
-                <AlertCircle className="w-3.5 h-3.5 text-destructive shrink-0" />
-              )}
-              <span className="truncate">
-                {record.gameName}/{record.fileName}
-              </span>
-              {record.status === "success" && record.revisionCount > 1 && (
-                <Badge variant="outline" className="text-xs shrink-0">
-                  v{record.revisionCount}
-                </Badge>
-              )}
-              <span className="text-muted-foreground text-xs ml-auto shrink-0">
-                {formatDistanceToNow(new Date(record.syncedAt), { addSuffix: true, locale })}
-              </span>
-            </div>
-          ))}
-        </div>
+        <ScrollArea className="h-40">
+          <div className="space-y-1">
+            {recent.map((record) => (
+              <div key={record.id} className="flex items-center gap-3 py-1.5 text-sm">
+                {record.status === RECORD_STATUS.success ? (
+                  <CheckCircle className="w-3.5 h-3.5 text-green-500 shrink-0" role="img" aria-label={t("history.successIcon")} aria-hidden={false} />
+                ) : (
+                  <AlertCircle className="w-3.5 h-3.5 text-destructive shrink-0" role="img" aria-label={t("history.errorIcon")} aria-hidden={false} />
+                )}
+                <span className="truncate">{record.gameName}</span>
+                <span className="text-muted-foreground text-xs ml-auto shrink-0">
+                  {formatDistanceToNow(new Date(record.syncedAt), { addSuffix: true, locale })}
+                </span>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
       </CardContent>
     </Card>
   );

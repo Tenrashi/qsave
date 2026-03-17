@@ -1,10 +1,8 @@
+import { invoke } from "@tauri-apps/api/core";
 import { fetch } from "@tauri-apps/plugin-http";
-import { readFile } from "@tauri-apps/plugin-fs";
 import { getValidToken } from "@/services/auth";
 import { getDriveFolderId, setDriveFolderId } from "@/lib/store";
-
-const DRIVE_API = "https://www.googleapis.com/drive/v3";
-const UPLOAD_API = "https://www.googleapis.com/upload/drive/v3";
+import { APP_NAME, STORE_KEYS, TAURI_COMMANDS, DRIVE_ENDPOINTS, MIME_TYPES, MAX_SAVES_PER_GAME } from "@/lib/constants";
 
 const authHeaders = async (): Promise<Record<string, string>> => {
   const token = await getValidToken();
@@ -20,7 +18,7 @@ const assertOk = async (res: Response, context: string) => {
 
 const createFolder = async (name: string, parentId: string): Promise<string> => {
   const headers = await authHeaders();
-  const res = await fetch(`${DRIVE_API}/files`, {
+  const res = await fetch(`${DRIVE_ENDPOINTS.api}/files`, {
     method: "POST",
     headers: {
       ...headers,
@@ -28,71 +26,108 @@ const createFolder = async (name: string, parentId: string): Promise<string> => 
     },
     body: JSON.stringify({
       name,
-      mimeType: "application/vnd.google-apps.folder",
+      mimeType: MIME_TYPES.googleFolder,
       parents: [parentId],
     }),
   });
 
   await assertOk(res, "Failed to create folder");
   const data = await res.json() as { id: string };
-  const key = parentId === "root" ? "__root__" : name;
+  const key = parentId === "root" ? STORE_KEYS.rootFolder : name;
   await setDriveFolderId(key, data.id);
   return data.id;
 };
 
-export const ensureQSaveFolder = async (): Promise<string> => {
-  const existing = await getDriveFolderId("__root__");
-  if (existing) {
-    try {
-      const headers = await authHeaders();
-      const res = await fetch(`${DRIVE_API}/files/${existing}?fields=id,trashed`, { headers });
-      if (res.ok) {
-        const data = await res.json() as { id: string; trashed: boolean };
-        if (!data.trashed) return existing;
-      }
-    } catch {
-      // Folder gone, recreate
-    }
-  }
-
-  return createFolder("QSave", "root");
-};
-
-export const ensureGameFolder = async (gameName: string): Promise<string> => {
-  const existing = await getDriveFolderId(gameName);
-  if (existing) return existing;
-
-  const rootId = await ensureQSaveFolder();
-  return createFolder(gameName, rootId);
-};
-
-export const findFileInFolder = async (
-  fileName: string,
-  folderId: string,
-): Promise<string | null> => {
+const findFolder = async (name: string, parentId: string): Promise<string | null> => {
   const headers = await authHeaders();
-  const query = `name='${fileName}' and '${folderId}' in parents and trashed=false`;
+  const query = `name='${name}' and '${parentId}' in parents and mimeType='${MIME_TYPES.googleFolder}' and trashed=false`;
   const res = await fetch(
-    `${DRIVE_API}/files?q=${encodeURIComponent(query)}&fields=files(id)`,
+    `${DRIVE_ENDPOINTS.api}/files?q=${encodeURIComponent(query)}&fields=files(id)`,
     { headers },
   );
 
-  await assertOk(res, "Failed to search files");
+  if (!res.ok) return null;
   const data = await res.json() as { files: { id: string }[] };
   return data.files.length > 0 ? data.files[0].id : null;
 };
 
-const buildMultipartBody = (
+export const ensureQSaveFolder = async (): Promise<string> => {
+  try {
+    const cached = await getDriveFolderId(STORE_KEYS.rootFolder);
+    if (cached) {
+      const found = await findFolder(APP_NAME, "root");
+      if (found === cached) return cached;
+    }
+
+    const existing = await findFolder(APP_NAME, "root");
+    if (existing) {
+      await setDriveFolderId(STORE_KEYS.rootFolder, existing);
+      return existing;
+    }
+
+    return await createFolder(APP_NAME, "root");
+  } catch (e) {
+    throw new Error(`Failed to ensure ${APP_NAME} folder: ${e instanceof Error ? e.message : e}`);
+  }
+};
+
+export const ensureGameFolder = async (gameName: string): Promise<string> => {
+  try {
+    const rootId = await ensureQSaveFolder();
+
+    const cached = await getDriveFolderId(gameName);
+    if (cached) {
+      const found = await findFolder(gameName, rootId);
+      if (found === cached) return cached;
+    }
+
+    const existing = await findFolder(gameName, rootId);
+    if (existing) {
+      await setDriveFolderId(gameName, existing);
+      return existing;
+    }
+
+    return await createFolder(gameName, rootId);
+  } catch (e) {
+    throw new Error(`Failed to ensure game folder "${gameName}": ${e instanceof Error ? e.message : e}`);
+  }
+};
+
+const listFilesInFolder = async (
+  folderId: string,
+): Promise<{ id: string; name: string; createdTime: string }[]> => {
+  const headers = await authHeaders();
+  const query = `'${folderId}' in parents and trashed=false`;
+  const res = await fetch(
+    `${DRIVE_ENDPOINTS.api}/files?q=${encodeURIComponent(query)}&fields=files(id,name,createdTime)&orderBy=createdTime`,
+    { headers },
+  );
+
+  await assertOk(res, "Failed to list files");
+  const data = await res.json() as { files: { id: string; name: string; createdTime: string }[] };
+  return data.files;
+};
+
+const deleteFile = async (fileId: string): Promise<void> => {
+  const headers = await authHeaders();
+  const res = await fetch(`${DRIVE_ENDPOINTS.api}/files/${fileId}`, {
+    method: "DELETE",
+    headers,
+  });
+  await assertOk(res, "Failed to delete file");
+};
+
+export const buildMultipartBody = (
   boundary: string,
   metadata: string,
   fileContent: Uint8Array,
 ): Uint8Array => {
   const encoder = new TextEncoder();
   const metadataPart = encoder.encode(
-    `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${metadata}\r\n`,
+    `--${boundary}\r\nContent-Type: ${MIME_TYPES.jsonUtf8}\r\n\r\n${metadata}\r\n`,
   );
   const filePart = encoder.encode(
-    `--${boundary}\r\nContent-Type: application/octet-stream\r\n\r\n`,
+    `--${boundary}\r\nContent-Type: ${MIME_TYPES.octetStream}\r\n\r\n`,
   );
   const end = encoder.encode(`\r\n--${boundary}--`);
 
@@ -111,64 +146,50 @@ const buildMultipartBody = (
   return result;
 };
 
-export const uploadFile = async (
-  localPath: string,
-  fileName: string,
+export const uploadGameArchive = async (
   gameName: string,
-): Promise<{ fileId: string; isUpdate: boolean }> => {
-  const folderId = await ensureGameFolder(gameName);
-  const existingId = await findFileInFolder(fileName, folderId);
+  filePaths: string[],
+): Promise<{ fileId: string }> => {
+  const zipBytes: number[] = await invoke(TAURI_COMMANDS.createZip, { files: filePaths });
+  const zipData = new Uint8Array(zipBytes);
 
-  const fileBytes = await readFile(localPath);
+  const folderId = await ensureGameFolder(gameName);
   const headers = await authHeaders();
 
-  if (existingId) {
-    const res = await fetch(`${UPLOAD_API}/files/${existingId}?uploadType=media`, {
-      method: "PATCH",
-      headers: {
-        ...headers,
-        "Content-Type": "application/octet-stream",
-      },
-      body: fileBytes,
-    });
-
-    await assertOk(res, "Failed to update file");
-    const data = await res.json() as { id: string };
-    return { fileId: data.id, isUpdate: true };
-  } else {
-    const metadata = JSON.stringify({
-      name: fileName,
-      parents: [folderId],
-    });
-
-    const boundary = "qsave_boundary_" + Date.now();
-    const body = buildMultipartBody(boundary, metadata, fileBytes);
-
-    const res = await fetch(`${UPLOAD_API}/files?uploadType=multipart`, {
-      method: "POST",
-      headers: {
-        ...headers,
-        "Content-Type": `multipart/related; boundary=${boundary}`,
-      },
-      body: body as unknown as BodyInit,
-    });
-
-    await assertOk(res, "Failed to upload file");
-    const data = await res.json() as { id: string };
-    return { fileId: data.id, isUpdate: false };
-  }
-};
-
-export const getRevisionCount = async (fileId: string): Promise<number> => {
+  // Delete oldest saves if at the limit
   try {
-    const headers = await authHeaders();
-    const res = await fetch(`${DRIVE_API}/files/${fileId}/revisions?fields=revisions(id)`, {
-      headers,
-    });
-    if (!res.ok) return 1;
-    const data = await res.json() as { revisions: { id: string }[] };
-    return data.revisions?.length ?? 1;
+    const existing = await listFilesInFolder(folderId);
+    const toDelete = existing.slice(0, Math.max(0, existing.length - MAX_SAVES_PER_GAME + 1));
+    for (const file of toDelete) {
+      await deleteFile(file.id);
+    }
   } catch {
-    return 1;
+    // Cleanup failure should not block upload
   }
+
+  // Upload new archive with timestamp
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const archiveName = `${gameName}_${timestamp}.zip`;
+
+  const metadata = JSON.stringify({
+    name: archiveName,
+    parents: [folderId],
+  });
+
+  const boundary = "qsave_boundary_" + Date.now();
+  const body = buildMultipartBody(boundary, metadata, zipData);
+
+  const res = await fetch(`${DRIVE_ENDPOINTS.upload}/files?uploadType=multipart`, {
+    method: "POST",
+    headers: {
+      ...headers,
+      "Content-Type": `multipart/related; boundary=${boundary}`,
+    },
+    body: body as unknown as BodyInit,
+  });
+
+  await assertOk(res, "Failed to upload archive");
+  const data = await res.json() as { id: string };
+  return { fileId: data.id };
 };
+

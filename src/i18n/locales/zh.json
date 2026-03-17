@@ -1,6 +1,8 @@
 {
   "app": {
     "title": "QSave",
+    "successIcon": "同步成功",
+    "errorIcon": "同步失败"
     "refresh": "刷新"
   },
   "auth": {
@@ -21,16 +23,24 @@
     "parsing": "正在解析游戏数据库...",
     "resolving": "正在解析存档路径 ({{current}}/{{total}})...",
     "scanningDisk": "正在扫描磁盘 ({{current}}/{{total}})...",
-    "sync": "同步"
+    "sync": "同步",
+    "watchTooltip": "启用自动同步",
+    "unwatchTooltip": "禁用自动同步"
   },
   "history": {
-    "title": "最近记录"
+    "title": "最近记录",
+    "successIcon": "同步成功",
+    "errorIcon": "同步失败"
   },
   "status": {
     "watchingActive": "监控中",
     "watchingInactive": "监控已停止",
     "game_one": "{{count}}个游戏",
     "game_other": "{{count}}个游戏"
+  },
+  "notifications": {
+    "gameDetectedOne": "检测到 {{name}}",
+    "gameDetectedOther": "检测到 {{count}} 个新游戏"
   },
   "settings": {
     "language": "语言"

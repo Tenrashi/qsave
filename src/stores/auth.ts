@@ -1,20 +1,21 @@
 import { create } from "zustand";
 import type { AuthState } from "@/domain/types";
 import { getAuthState, clearAuth } from "@/lib/store";
-import { startOAuthFlow, exchangeCodeForTokens } from "@/services/auth";
+import { startOAuthFlow } from "@/services/auth";
 
 type AuthStore = {
   auth: AuthState;
   loading: boolean;
+  error: string | null;
   init: () => Promise<void>;
   login: () => Promise<void>;
-  handleOAuthCode: (code: string) => Promise<void>;
   logout: () => Promise<void>;
 };
 
 export const useAuthStore = create<AuthStore>((set) => ({
   auth: { isAuthenticated: false },
   loading: true,
+  error: null,
 
   init: async () => {
     try {
@@ -26,21 +27,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   login: async () => {
-    set({ loading: true });
+    set({ loading: true, error: null });
     try {
-      await startOAuthFlow();
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  handleOAuthCode: async (code: string) => {
-    set({ loading: true });
-    try {
-      const state = await exchangeCodeForTokens(code);
+      const state = await startOAuthFlow();
       set({ auth: state, loading: false });
-    } catch {
-      set({ loading: false });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      console.error("OAuth login failed:", message);
+      set({ loading: false, error: message });
     }
   },
 

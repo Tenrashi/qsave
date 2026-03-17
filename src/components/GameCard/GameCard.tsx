@@ -1,34 +1,29 @@
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
-import { Upload, CheckCircle, AlertCircle, Loader2, FolderOpen } from "lucide-react";
+import { Upload, CheckCircle, AlertCircle, Loader2, FolderOpen, Eye, EyeOff } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { useAuthStore } from "@/stores/auth";
 import { useSyncStore } from "@/stores/sync";
+import { SYNC_STATUS } from "@/domain/types";
 import type { Game, SyncStatus } from "@/domain/types";
+import { QUERY_KEYS } from "@/lib/constants";
 import { syncGame } from "@/services/sync";
+import { computeGameHash } from "@/lib/hash";
 import { dateFnsLocales } from "@/lib/date-locales";
 import { GameBanner } from "./GameBanner/GameBanner";
 import { formatSize } from "./utils/formatSize";
 
-const SyncStatusIcon = ({ status }: { status: SyncStatus }) => {
-  switch (status) {
-    case "syncing":
-      return <Loader2 className="w-3.5 h-3.5 text-blue-500 animate-spin" />;
-    case "success":
-      return <CheckCircle className="w-3.5 h-3.5 text-green-500" />;
-    case "error":
-      return <AlertCircle className="w-3.5 h-3.5 text-destructive" />;
-    default:
-      return null;
-  }
+const SyncStatusIcon = ({ status, isSynced }: { status: SyncStatus; isSynced: boolean }) => {
+  if (status === SYNC_STATUS.syncing) return <Loader2 className="w-3.5 h-3.5 text-blue-500 animate-spin" role="img" aria-label="syncing" aria-hidden={false} />;
+  if (status === SYNC_STATUS.error) return <AlertCircle className="w-3.5 h-3.5 text-destructive" role="img" aria-label="sync error" aria-hidden={false} />;
+  if (isSynced) return <CheckCircle className="w-3.5 h-3.5 text-green-500" role="img" aria-label="synced" aria-hidden={false} />;
+  return null;
 };
-
-const steamHeaderUrl = (steamId: number) =>
-  `https://cdn.cloudflare.steamstatic.com/steam/apps/${steamId}/header.jpg`;
 
 export type GameCardProps = {
   game: Game;
@@ -38,10 +33,21 @@ export const GameCard = memo(({ game }: GameCardProps) => {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const { auth } = useAuthStore();
-  const { gameStatuses, setGameStatus } = useSyncStore();
+  const {
+    gameStatuses,
+    setGameStatus,
+    isGameWatched,
+    toggleGameWatch,
+    syncFingerprints,
+    updateSyncFingerprint,
+  } = useSyncStore();
   const locale = dateFnsLocales[i18n.language] ?? enUS;
-  const status = gameStatuses[game.name] ?? "idle";
-  const isSyncing = status === "syncing";
+  const status = gameStatuses[game.name] ?? SYNC_STATUS.idle;
+  const isSyncing = status === SYNC_STATUS.syncing;
+  const watched = isGameWatched(game.name);
+
+  const currentHash = computeGameHash(game.saveFiles);
+  const isSynced = syncFingerprints[game.name]?.hash === currentHash;
 
   const totalSize = game.saveFiles.reduce((sum, f) => sum + f.sizeBytes, 0);
   const lastModified = game.saveFiles.reduce(
@@ -50,15 +56,18 @@ export const GameCard = memo(({ game }: GameCardProps) => {
   );
 
   const handleSync = async () => {
-    setGameStatus(game.name, "syncing");
+    setGameStatus(game.name, SYNC_STATUS.syncing);
     try {
-      const results = await syncGame(game);
-      const hasError = results.some((r) => r.status === "error");
-      setGameStatus(game.name, hasError ? "error" : "success");
+      const result = await syncGame(game);
+      const newStatus = result.status === SYNC_STATUS.error ? SYNC_STATUS.error : SYNC_STATUS.success;
+      setGameStatus(game.name, newStatus);
+      if (newStatus === SYNC_STATUS.success) {
+        await updateSyncFingerprint(game.name, currentHash);
+      }
     } catch {
-      setGameStatus(game.name, "error");
+      setGameStatus(game.name, SYNC_STATUS.error);
     }
-    queryClient.invalidateQueries({ queryKey: ["syncHistory"] });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.syncHistory });
   };
 
   return (
@@ -68,7 +77,7 @@ export const GameCard = memo(({ game }: GameCardProps) => {
         <div className="flex items-center justify-between flex-1 min-w-0 pl-2 pr-4">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <span className="font-medium truncate">{game.name}</span>
-            <SyncStatusIcon status={status} />
+            <SyncStatusIcon status={status} isSynced={isSynced} />
           </div>
           <div className="flex items-center gap-3 shrink-0 text-xs text-muted-foreground">
             <div className="flex items-center gap-1.5">
@@ -77,20 +86,43 @@ export const GameCard = memo(({ game }: GameCardProps) => {
             </div>
             <span>{formatDistanceToNow(lastModified, { addSuffix: true, locale })}</span>
             {auth.isAuthenticated && (
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={handleSync}
-                disabled={isSyncing}
-                className="ml-1"
-              >
-                {isSyncing ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
-                ) : (
-                  <Upload className="w-3.5 h-3.5 mr-1.5" />
-                )}
-                {t("games.sync")}
-              </Button>
+              <>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        aria-label={watched ? t("games.unwatchTooltip") : t("games.watchTooltip")}
+                        onClick={() => toggleGameWatch(game.name)}
+                      />
+                    }
+                  >
+                    {watched ? (
+                      <Eye className="w-3.5 h-3.5 text-blue-500" />
+                    ) : (
+                      <EyeOff className="w-3.5 h-3.5" />
+                    )}
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {watched ? t("games.unwatchTooltip") : t("games.watchTooltip")}
+                  </TooltipContent>
+                </Tooltip>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={handleSync}
+                  disabled={isSyncing}
+                >
+                  {isSyncing ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                  ) : (
+                    <Upload className="w-3.5 h-3.5 mr-1.5" />
+                  )}
+                  {t("games.sync")}
+                </Button>
+              </>
             )}
           </div>
         </div>

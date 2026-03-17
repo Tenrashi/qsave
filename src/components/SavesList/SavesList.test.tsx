@@ -29,7 +29,7 @@ const Wrapper = (props: Omit<SavesListProps, "scrollRef">) => {
 describe("SavesList", () => {
   it("shows empty state when no games", () => {
     renderWithProviders(<Wrapper games={[]} />);
-    expect(screen.getByText("No games detected")).toBeInTheDocument();
+    expect(screen.getByText("games.noGamesDetected")).toBeInTheDocument();
   });
 
   it("renders game cards for detected games", () => {

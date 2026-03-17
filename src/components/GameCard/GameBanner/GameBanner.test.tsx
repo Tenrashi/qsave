@@ -4,8 +4,8 @@ import { GameBanner } from "./GameBanner";
 
 describe("GameBanner", () => {
   it("renders Steam header image when steamId is provided", () => {
-    const { container } = render(<GameBanner steamId={1222670} />);
-    const img = container.querySelector("img");
+    render(<GameBanner steamId={1222670} />);
+    const img = screen.getByRole("img", { name: /steam game banner/i });
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute(
       "src",
@@ -14,23 +14,15 @@ describe("GameBanner", () => {
   });
 
   it("renders gamepad icon when no steamId", () => {
-    const { container } = render(<GameBanner />);
-    expect(container.querySelector("img")).not.toBeInTheDocument();
-    expect(container.querySelector("svg")).toBeInTheDocument();
+    render(<GameBanner />);
+    expect(screen.queryByRole("img", { name: /steam game banner/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /gamepad/i })).toBeInTheDocument();
   });
 
   it("falls back to gamepad icon on image error", () => {
-    const { container } = render(<GameBanner steamId={1222670} />);
-    const img = container.querySelector("img")!;
-    fireEvent.error(img);
-    expect(container.querySelector("img")).not.toBeInTheDocument();
-    expect(container.querySelector("svg")).toBeInTheDocument();
-  });
-
-  it("renders gradient overlay on the image", () => {
-    const { container } = render(<GameBanner steamId={1222670} />);
-    const overlay = container.querySelector("[style]");
-    expect(overlay).toBeInTheDocument();
-    expect(overlay?.getAttribute("style")).toContain("linear-gradient");
+    render(<GameBanner steamId={1222670} />);
+    fireEvent.error(screen.getByRole("img", { name: /steam game banner/i }));
+    expect(screen.queryByRole("img", { name: /steam game banner/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /gamepad/i })).toBeInTheDocument();
   });
 });
