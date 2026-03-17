@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
 import { invoke } from "@tauri-apps/api/core";
-import { Plus, Trash2, FolderOpen } from "lucide-react";
+import { Trash2, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,7 +17,11 @@ import { TAURI_COMMANDS, QUERY_KEYS } from "@/lib/constants";
 import { scanManualGame } from "@/services/scanner";
 import type { Game } from "@/domain/types";
 
-export const AddGameDialog = () => {
+export type AddGameDialogProps = {
+  trigger: React.ReactElement;
+};
+
+export const AddGameDialog = ({ trigger }: AddGameDialogProps) => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -37,7 +41,7 @@ export const AddGameDialog = () => {
   };
 
   const handleRemovePath = (path: string) => {
-    setPaths((prev) => prev.filter((p) => p !== path));
+    setPaths((prev) => prev.filter((existing) => existing !== path));
   };
 
   const handleSubmit = async () => {
@@ -49,7 +53,7 @@ export const AddGameDialog = () => {
         addManualGame(trimmedName, paths),
       ]);
       queryClient.setQueryData<Game[]>(QUERY_KEYS.games, (prev = []) =>
-        [...prev, newGame].sort((a, b) => a.name.localeCompare(b.name)),
+        [...prev, newGame].sort((gameA, gameB) => gameA.name.localeCompare(gameB.name)),
       );
       setName("");
       setPaths([]);
@@ -70,13 +74,7 @@ export const AddGameDialog = () => {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger
-        render={
-          <Button variant="ghost" size="icon" className="h-8 w-8" title={t("games.addGame")} />
-        }
-      >
-        <Plus className="w-4 h-4" />
-      </DialogTrigger>
+      <DialogTrigger render={trigger} />
 
       <DialogPopup className="max-w-md">
         <DialogTitle className="mb-4">{t("games.addGameTitle")}</DialogTitle>

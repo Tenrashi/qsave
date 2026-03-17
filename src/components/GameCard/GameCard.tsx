@@ -60,7 +60,7 @@ export const GameCard = memo(({ game }: GameCardProps) => {
     try {
       await removeManualGame(game.name);
       queryClient.setQueryData<Game[]>(QUERY_KEYS.games, (prev = []) =>
-        prev.filter((g) => g.name !== game.name),
+        prev.filter((existing) => existing.name !== game.name),
       );
     } catch {
       // store write failed — ignore

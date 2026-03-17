@@ -18,37 +18,43 @@ type RustDetectedGame = {
   saveFiles: RustSaveFile[];
 };
 
-function toGame(game: RustDetectedGame, isManual = false): Game {
-  return {
-    name: game.name,
-    steamId: game.steamId ?? undefined,
-    savePaths: game.savePaths,
-    saveFiles: game.saveFiles.map(
-      (f): SaveFile => ({
-        name: f.name,
-        path: f.path,
-        sizeBytes: f.sizeBytes,
-        lastModified: new Date(f.lastModified),
-        gameName: f.gameName,
-      }),
-    ),
-    isManual,
-  };
-}
+const toGame = (game: RustDetectedGame, isManual = false): Game => ({
+  name: game.name,
+  steamId: game.steamId ?? undefined,
+  savePaths: game.savePaths,
+  saveFiles: game.saveFiles.map(
+    (f): SaveFile => ({
+      name: f.name,
+      path: f.path,
+      sizeBytes: f.sizeBytes,
+      lastModified: new Date(f.lastModified),
+      gameName: f.gameName,
+    }),
+  ),
+  isManual,
+});
 
-export async function scanManualGame(name: string, paths: string[]): Promise<Game> {
+export const scanManualGame = async (name: string, paths: string[]): Promise<Game> => {
   const result = await invoke<RustDetectedGame>(TAURI_COMMANDS.scanManualGame, { name, paths });
   return toGame(result, true);
-}
+};
 
-export async function scanForGames(): Promise<Game[]> {
+export const rescanGame = async (game: Game): Promise<Game> => {
+  const result = await invoke<RustDetectedGame>(TAURI_COMMANDS.scanManualGame, {
+    name: game.name,
+    paths: game.savePaths,
+  });
+  return toGame(result, game.isManual);
+};
+
+export const scanForGames = async (): Promise<Game[]> => {
   const [autoResults, manualEntries] = await Promise.all([
     invoke<RustDetectedGame[]>(TAURI_COMMANDS.scanGames),
     getManualGames(),
   ]);
 
-  const autoGames = autoResults.map((g) => toGame(g));
-  const autoNames = new Set(autoGames.map((g) => g.name));
+  const autoGames = autoResults.map((game) => toGame(game));
+  const autoNames = new Set(autoGames.map((game) => game.name));
 
   const manualGames = await Promise.all(
     manualEntries
@@ -57,9 +63,9 @@ export async function scanForGames(): Promise<Game[]> {
         invoke<RustDetectedGame>(TAURI_COMMANDS.scanManualGame, {
           name: entry.name,
           paths: entry.paths,
-        }).then((g) => toGame(g, true)),
+        }).then((game) => toGame(game, true)),
       ),
   );
 
-  return [...autoGames, ...manualGames].sort((a, b) => a.name.localeCompare(b.name));
-}
+  return [...autoGames, ...manualGames].sort((gameA, gameB) => gameA.name.localeCompare(gameB.name));
+};
