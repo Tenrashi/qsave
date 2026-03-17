@@ -1,6 +1,8 @@
 {
   "app": {
     "title": "QSave",
+    "successIcon": "동기화 성공",
+    "errorIcon": "동기화 실패"
     "refresh": "새로고침"
   },
   "auth": {
@@ -26,7 +28,9 @@
     "unwatchTooltip": "자동 동기화 비활성화"
   },
   "history": {
-    "title": "최근 기록"
+    "title": "최근 기록",
+    "successIcon": "동기화 성공",
+    "errorIcon": "동기화 실패"
   },
   "status": {
     "watchingActive": "감시 중",

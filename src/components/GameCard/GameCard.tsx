@@ -9,7 +9,9 @@ import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { useAuthStore } from "@/stores/auth";
 import { useSyncStore } from "@/stores/sync";
+import { SYNC_STATUS } from "@/domain/types";
 import type { Game, SyncStatus } from "@/domain/types";
+import { QUERY_KEYS } from "@/lib/constants";
 import { syncGame } from "@/services/sync";
 import { computeGameHash } from "@/lib/hash";
 import { dateFnsLocales } from "@/lib/date-locales";
@@ -17,9 +19,9 @@ import { GameBanner } from "./GameBanner/GameBanner";
 import { formatSize } from "./utils/formatSize";
 
 const SyncStatusIcon = ({ status, isSynced }: { status: SyncStatus; isSynced: boolean }) => {
-  if (status === "syncing") return <Loader2 className="w-3.5 h-3.5 text-blue-500 animate-spin" />;
-  if (status === "error") return <AlertCircle className="w-3.5 h-3.5 text-destructive" />;
-  if (isSynced) return <CheckCircle className="w-3.5 h-3.5 text-green-500" />;
+  if (status === SYNC_STATUS.syncing) return <Loader2 className="w-3.5 h-3.5 text-blue-500 animate-spin" role="img" aria-label="syncing" aria-hidden={false} />;
+  if (status === SYNC_STATUS.error) return <AlertCircle className="w-3.5 h-3.5 text-destructive" role="img" aria-label="sync error" aria-hidden={false} />;
+  if (isSynced) return <CheckCircle className="w-3.5 h-3.5 text-green-500" role="img" aria-label="synced" aria-hidden={false} />;
   return null;
 };
 
@@ -40,8 +42,8 @@ export const GameCard = memo(({ game }: GameCardProps) => {
     updateSyncFingerprint,
   } = useSyncStore();
   const locale = dateFnsLocales[i18n.language] ?? enUS;
-  const status = gameStatuses[game.name] ?? "idle";
-  const isSyncing = status === "syncing";
+  const status = gameStatuses[game.name] ?? SYNC_STATUS.idle;
+  const isSyncing = status === SYNC_STATUS.syncing;
   const watched = isGameWatched(game.name);
 
   const currentHash = computeGameHash(game.saveFiles);
@@ -54,18 +56,18 @@ export const GameCard = memo(({ game }: GameCardProps) => {
   );
 
   const handleSync = async () => {
-    setGameStatus(game.name, "syncing");
+    setGameStatus(game.name, SYNC_STATUS.syncing);
     try {
       const result = await syncGame(game);
-      const newStatus = result.status === "error" ? "error" : "success";
+      const newStatus = result.status === SYNC_STATUS.error ? SYNC_STATUS.error : SYNC_STATUS.success;
       setGameStatus(game.name, newStatus);
-      if (newStatus === "success") {
+      if (newStatus === SYNC_STATUS.success) {
         await updateSyncFingerprint(game.name, currentHash);
       }
     } catch {
-      setGameStatus(game.name, "error");
+      setGameStatus(game.name, SYNC_STATUS.error);
     }
-    queryClient.invalidateQueries({ queryKey: ["syncHistory"] });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.syncHistory });
   };
 
   return (

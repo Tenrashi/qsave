@@ -83,10 +83,9 @@ pub fn run() {
                 .menu(&menu)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "show" => {
-                        if let Some(window) = app.get_webview_window("main") {
-                            let _ = window.show();
-                            let _ = window.set_focus();
-                        }
+                        let Some(window) = app.get_webview_window("main") else { return };
+                        let _ = window.show();
+                        let _ = window.set_focus();
                     }
                     "quit" => {
                         app.exit(0);
@@ -94,12 +93,10 @@ pub fn run() {
                     _ => {}
                 })
                 .on_tray_icon_event(|tray, event| {
-                    if let tauri::tray::TrayIconEvent::Click { .. } = event {
-                        if let Some(window) = tray.app_handle().get_webview_window("main") {
-                            let _ = window.show();
-                            let _ = window.set_focus();
-                        }
-                    }
+                    let tauri::tray::TrayIconEvent::Click { .. } = event else { return };
+                    let Some(window) = tray.app_handle().get_webview_window("main") else { return };
+                    let _ = window.show();
+                    let _ = window.set_focus();
                 })
                 .build(app)?;
 
@@ -114,11 +111,9 @@ pub fn run() {
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|app, event| {
-            if let tauri::RunEvent::Reopen { .. } = event {
-                if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.show();
-                    let _ = window.set_focus();
-                }
-            }
+            let tauri::RunEvent::Reopen { .. } = event else { return };
+            let Some(window) = app.get_webview_window("main") else { return };
+            let _ = window.show();
+            let _ = window.set_focus();
         });
 }

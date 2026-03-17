@@ -13,6 +13,22 @@ export type SaveFile = {
   gameName: string;
 };
 
+export const SYNC_STATUS = {
+  idle: "idle",
+  syncing: "syncing",
+  success: "success",
+  error: "error",
+} as const;
+
+export type SyncStatus = (typeof SYNC_STATUS)[keyof typeof SYNC_STATUS];
+
+export const RECORD_STATUS = {
+  success: "success",
+  error: "error",
+} as const;
+
+export type RecordStatus = (typeof RECORD_STATUS)[keyof typeof RECORD_STATUS];
+
 export type SyncRecord = {
   id: string;
   gameName: string;
@@ -20,7 +36,7 @@ export type SyncRecord = {
   syncedAt: Date;
   driveFileId: string;
   revisionCount: number;
-  status: "success" | "error";
+  status: RecordStatus;
   error?: string;
 };
 
@@ -31,8 +47,6 @@ export type AuthState = {
   refreshToken?: string;
   expiresAt?: number;
 };
-
-export type SyncStatus = "idle" | "syncing" | "success" | "error";
 
 export type GameSyncState = {
   gameName: string;

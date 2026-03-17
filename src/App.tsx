@@ -9,6 +9,7 @@ import { useGames } from "@/hooks/useGames";
 import { useSyncHistory } from "@/hooks/useSyncHistory";
 import { useAutoSync } from "@/hooks/useAutoSync";
 import { useGameDetectionNotify } from "@/hooks/useGameDetectionNotify";
+import { APP_NAME } from "@/lib/constants";
 import { AuthStatus } from "@/components/AuthStatus/AuthStatus";
 import { SearchBar } from "@/components/SearchBar/SearchBar";
 import { SavesList } from "@/components/SavesList/SavesList";
@@ -47,7 +48,7 @@ const App = () => {
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
       <div className="flex items-center justify-between px-4 py-3 border-b">
-        <h1 className="text-lg font-bold tracking-tight">QSave</h1>
+        <h1 className="text-lg font-bold tracking-tight">{APP_NAME}</h1>
         <div className="flex items-center gap-1">
           <LanguageSelector />
           <Button

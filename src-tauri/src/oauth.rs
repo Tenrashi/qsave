@@ -38,21 +38,17 @@ fn extract_code(request_line: &str) -> Result<String, String> {
 
     let query = path.split('?').nth(1).ok_or("No query parameters")?;
 
-    for param in query.split('&') {
-        let mut parts = param.splitn(2, '=');
-        let key = parts.next().unwrap_or("");
-        let value = parts.next().unwrap_or("");
-
-        if key == "code" {
-            return Ok(url_decode(value));
-        }
-
-        if key == "error" {
-            return Err(format!("OAuth error: {}", value));
-        }
-    }
-
-    Err("No authorization code in callback".to_string())
+    query
+        .split('&')
+        .find_map(|param| {
+            let (key, value) = param.split_once('=')?;
+            match key {
+                "code" => Some(Ok(url_decode(value))),
+                "error" => Some(Err(format!("OAuth error: {}", value))),
+                _ => None,
+            }
+        })
+        .unwrap_or(Err("No authorization code in callback".to_string()))
 }
 
 /// Starts a one-shot HTTP server, opens the OAuth URL in the browser,

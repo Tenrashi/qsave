@@ -1,4 +1,6 @@
+import { RECORD_STATUS } from "@/domain/types";
 import type { Game, SyncRecord } from "@/domain/types";
+import { APP_NAME } from "@/lib/constants";
 import { uploadGameArchive } from "@/services/drive";
 import { addSyncRecord } from "@/lib/store";
 import { notify } from "@/lib/notify";
@@ -17,11 +19,11 @@ export const syncGame = async (game: Game): Promise<SyncRecord> => {
       syncedAt: new Date(),
       driveFileId: fileId,
       revisionCount: 1,
-      status: "success",
+      status: RECORD_STATUS.success,
     };
 
     await addSyncRecord(record);
-    await notify("QSave", `${game.name}: ${game.saveFiles.length} save(s) synced`);
+    await notify(APP_NAME, `${game.name}: ${game.saveFiles.length} save(s) synced`);
     return record;
   } catch (err) {
     const record: SyncRecord = {
@@ -31,12 +33,12 @@ export const syncGame = async (game: Game): Promise<SyncRecord> => {
       syncedAt: new Date(),
       driveFileId: "",
       revisionCount: 0,
-      status: "error",
+      status: RECORD_STATUS.error,
       error: err instanceof Error ? err.message : String(err),
     };
 
     await addSyncRecord(record);
-    await notify("QSave", `${game.name}: sync failed`);
+    await notify(APP_NAME, `${game.name}: sync failed`);
     return record;
   }
 };

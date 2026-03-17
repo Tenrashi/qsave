@@ -36,16 +36,14 @@ describe("SyncHistory", () => {
   });
 
   it("shows success icon for successful syncs", async () => {
-    const { container } = renderWithProviders(<SyncHistory />);
+    renderWithProviders(<SyncHistory />);
     await screen.findByText("The Sims 4");
-    const successIcons = container.querySelectorAll(".text-green-500");
-    expect(successIcons.length).toBe(1);
+    expect(screen.getAllByRole("img", { name: "history.successIcon" })).toHaveLength(1);
   });
 
   it("shows error icon for failed syncs", async () => {
-    const { container } = renderWithProviders(<SyncHistory />);
+    renderWithProviders(<SyncHistory />);
     await screen.findByText("Cyberpunk 2077");
-    const errorIcons = container.querySelectorAll(".text-destructive");
-    expect(errorIcons.length).toBe(1);
+    expect(screen.getAllByRole("img", { name: "history.errorIcon" })).toHaveLength(1);
   });
 });

@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { SYNC_STATUS } from "@/domain/types";
 import type { Game } from "@/domain/types";
+import { QUERY_KEYS } from "@/lib/constants";
 import { useSyncStore } from "@/stores/sync";
 import { useAuthStore } from "@/stores/auth";
 import { startWatching, stopWatching } from "@/lib/watcher";
@@ -64,7 +66,7 @@ export const useAutoSync = (
 
       for (const gameName of affectedGames) {
         if (!store.isGameWatched(gameName)) continue;
-        if (store.gameStatuses[gameName] === "syncing") continue;
+        if (store.gameStatuses[gameName] === SYNC_STATUS.syncing) continue;
 
         scheduleAutoSync(gameName, () => {
           const currentGame = gamesRef.current.find((g) => g.name === gameName);
@@ -75,18 +77,18 @@ export const useAutoSync = (
           const existing = currentStore.syncFingerprints[gameName];
           if (existing?.hash === hash) return;
 
-          currentStore.setGameStatus(gameName, "syncing");
+          currentStore.setGameStatus(gameName, SYNC_STATUS.syncing);
           syncGame(currentGame)
             .then((record) => {
-              const status = record.status === "error" ? "error" : "success";
+              const status = record.status === SYNC_STATUS.error ? SYNC_STATUS.error : SYNC_STATUS.success;
               currentStore.setGameStatus(gameName, status);
-              if (status === "success") {
+              if (status === SYNC_STATUS.success) {
                 currentStore.updateSyncFingerprint(gameName, hash);
               }
-              queryClient.invalidateQueries({ queryKey: ["syncHistory"] });
+              queryClient.invalidateQueries({ queryKey: QUERY_KEYS.syncHistory });
             })
             .catch(() => {
-              currentStore.setGameStatus(gameName, "error");
+              currentStore.setGameStatus(gameName, SYNC_STATUS.error);
             });
         });
       }

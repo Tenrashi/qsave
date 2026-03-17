@@ -1,6 +1,8 @@
 {
   "app": {
     "title": "QSave",
+    "successIcon": "同期成功",
+    "errorIcon": "同期失敗"
     "refresh": "更新"
   },
   "auth": {
@@ -26,7 +28,9 @@
     "unwatchTooltip": "自動同期を無効にする"
   },
   "history": {
-    "title": "最近の履歴"
+    "title": "最近の履歴",
+    "successIcon": "同期成功",
+    "errorIcon": "同期失敗"
   },
   "status": {
     "watchingActive": "監視中",

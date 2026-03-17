@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { Game, SaveFile } from "@/domain/types";
+import { TAURI_COMMANDS } from "@/lib/constants";
 
 type RustSaveFile = {
   name: string;
@@ -17,7 +18,7 @@ type RustDetectedGame = {
 };
 
 export async function scanForGames(): Promise<Game[]> {
-  const results = await invoke<RustDetectedGame[]>("scan_games");
+  const results = await invoke<RustDetectedGame[]>(TAURI_COMMANDS.scanGames);
 
   return results.map((game) => ({
     name: game.name,

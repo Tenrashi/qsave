@@ -1,6 +1,8 @@
 {
   "app": {
     "title": "QSave",
+    "successIcon": "Sincronização bem-sucedida",
+    "errorIcon": "Falha na sincronização"
     "refresh": "Atualizar"
   },
   "auth": {
@@ -26,7 +28,9 @@
     "unwatchTooltip": "Desativar sincronização automática"
   },
   "history": {
-    "title": "Histórico recente"
+    "title": "Histórico recente",
+    "successIcon": "Sincronização bem-sucedida",
+    "errorIcon": "Falha na sincronização"
   },
   "status": {
     "watchingActive": "Monitoramento ativo",

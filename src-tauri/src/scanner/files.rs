@@ -7,43 +7,39 @@ use super::localized_paths::try_localized_path;
 use super::types::{DetectedGame, SaveFileInfo};
 
 pub fn collect_save_files(dir: &Path, game_name: &str) -> Vec<SaveFileInfo> {
-    let entries = match fs::read_dir(dir) {
-        Ok(e) => e,
-        Err(_) => return Vec::new(),
+    let Ok(entries) = fs::read_dir(dir) else {
+        return Vec::new();
     };
 
-    let mut files = Vec::new();
+    entries
+        .flatten()
+        .flat_map(|entry| {
+            let path = entry.path();
 
-    for entry in entries.flatten() {
-        let path = entry.path();
+            if path.is_dir() {
+                return collect_save_files(&path, game_name);
+            }
 
-        if path.is_dir() {
-            files.extend(collect_save_files(&path, game_name));
-            continue;
-        }
+            let Ok(meta) = fs::metadata(&path) else {
+                return Vec::new();
+            };
 
-        let meta = match fs::metadata(&path) {
-            Ok(m) => m,
-            Err(_) => continue,
-        };
+            let modified = meta
+                .modified()
+                .unwrap_or(SystemTime::UNIX_EPOCH)
+                .duration_since(SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_millis() as u64)
+                .unwrap_or(0);
 
-        let modified = meta
-            .modified()
-            .unwrap_or(SystemTime::UNIX_EPOCH)
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .map(|d| d.as_millis() as u64)
-            .unwrap_or(0);
-
-        files.push(SaveFileInfo {
-            name: entry.file_name().to_string_lossy().to_string(),
-            path: path.to_string_lossy().to_string(),
-            size_bytes: meta.len(),
-            last_modified: modified,
-            game_name: game_name.to_string(),
-        });
-    }
-
-    files
+            vec![SaveFileInfo {
+                name: entry.file_name().to_string_lossy().to_string(),
+                path: path.to_string_lossy().to_string(),
+                size_bytes: meta.len(),
+                last_modified: modified,
+                game_name: game_name.to_string(),
+            }]
+        })
+        .collect()
 }
 
 pub fn scan_candidates(candidates: Vec<(String, Option<u64>, Vec<String>)>) -> Vec<DetectedGame> {

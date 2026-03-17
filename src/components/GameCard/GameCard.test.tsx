@@ -87,8 +87,8 @@ describe("GameCard", () => {
       },
     });
 
-    const { container } = renderGameCard();
-    expect(container.querySelector(".text-green-500")).toBeInTheDocument();
+    renderGameCard();
+    expect(screen.getByRole("img", { name: "synced" })).toBeInTheDocument();
   });
 
   it("does not show checkmark when game has unsynced changes", () => {
@@ -99,7 +99,7 @@ describe("GameCard", () => {
       },
     });
 
-    const { container } = renderGameCard();
-    expect(container.querySelector(".text-green-500")).not.toBeInTheDocument();
+    renderGameCard();
+    expect(screen.queryByRole("img", { name: "synced" })).not.toBeInTheDocument();
   });
 });

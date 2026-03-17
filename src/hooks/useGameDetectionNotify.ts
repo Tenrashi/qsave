@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { Game } from "@/domain/types";
 import { notify } from "@/lib/notify";
+import { APP_NAME } from "@/lib/constants";
 
 export const useGameDetectionNotify = (games: Game[] | undefined): void => {
   const { t } = useTranslation();
@@ -24,9 +25,9 @@ export const useGameDetectionNotify = (games: Game[] | undefined): void => {
     if (newGames.length === 0) return;
 
     if (newGames.length === 1) {
-      notify("QSave", t("notifications.gameDetectedOne", { name: newGames[0].name }));
+      notify(APP_NAME, t("notifications.gameDetectedOne", { name: newGames[0].name }));
     } else {
-      notify("QSave", t("notifications.gameDetectedOther", { count: newGames.length }));
+      notify(APP_NAME, t("notifications.gameDetectedOther", { count: newGames.length }));
     }
   }, [games, t]);
 };
