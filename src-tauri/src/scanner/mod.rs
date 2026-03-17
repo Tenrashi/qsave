@@ -8,11 +8,31 @@ mod types;
 pub use types::DetectedGame;
 
 use std::collections::HashMap;
+use std::path::Path;
 
-use files::scan_candidates;
+use files::{collect_save_files, scan_candidates};
 use manifest::{fetch_manifest, resolve_candidates};
 use resolve::{get_home, get_username};
 use types::ManifestEntry;
+
+pub fn scan_manual_game_blocking(name: String, paths: Vec<String>) -> DetectedGame {
+    let save_files: Vec<_> = paths
+        .iter()
+        .flat_map(|p| collect_save_files(Path::new(p), &name))
+        .collect();
+
+    let existing_paths = paths
+        .into_iter()
+        .filter(|p| Path::new(p).exists())
+        .collect();
+
+    DetectedGame {
+        name,
+        steam_id: None,
+        save_paths: existing_paths,
+        save_files,
+    }
+}
 
 pub fn scan_games_blocking() -> Result<Vec<DetectedGame>, String> {
     let body = fetch_manifest()?;

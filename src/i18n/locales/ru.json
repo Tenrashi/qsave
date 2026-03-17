@@ -1,8 +1,6 @@
 {
   "app": {
     "title": "QSave",
-    "successIcon": "Синхронизация успешна",
-    "errorIcon": "Ошибка синхронизации"
     "refresh": "Обновить"
   },
   "auth": {

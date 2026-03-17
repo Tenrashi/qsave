@@ -1,8 +1,6 @@
 {
   "app": {
     "title": "QSave",
-    "successIcon": "동기화 성공",
-    "errorIcon": "동기화 실패"
     "refresh": "새로고침"
   },
   "auth": {

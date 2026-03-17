@@ -1,8 +1,6 @@
 {
   "app": {
     "title": "QSave",
-    "successIcon": "同步成功",
-    "errorIcon": "同步失败"
     "refresh": "刷新"
   },
   "auth": {

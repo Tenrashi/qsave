@@ -16,6 +16,7 @@ import { SavesList } from "@/components/SavesList/SavesList";
 import { SyncHistory } from "@/components/SyncHistory/SyncHistory";
 import { StatusBar } from "@/components/StatusBar/StatusBar";
 import { LanguageSelector } from "@/components/LanguageSelector/LanguageSelector";
+import { AddGameDialog } from "@/components/AddGameDialog/AddGameDialog";
 
 
 const App = () => {
@@ -51,6 +52,7 @@ const App = () => {
         <h1 className="text-lg font-bold tracking-tight">{APP_NAME}</h1>
         <div className="flex items-center gap-1">
           <LanguageSelector />
+          <AddGameDialog />
           <Button
             variant="ghost"
             size="icon"

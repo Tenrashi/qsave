@@ -68,6 +68,35 @@ export async function setWatchedGames(names: string[]): Promise<void> {
   await s.set(STORE_KEYS.watchedGames, names);
 }
 
+// Manual games
+export type ManualGameEntry = { name: string; paths: string[] };
+
+export async function getManualGames(): Promise<ManualGameEntry[]> {
+  const s = await getStore();
+  return (await s.get<ManualGameEntry[]>(STORE_KEYS.manualGames)) ?? [];
+}
+
+export async function setManualGames(games: ManualGameEntry[]): Promise<void> {
+  const s = await getStore();
+  await s.set(STORE_KEYS.manualGames, games);
+}
+
+export async function addManualGame(name: string, paths: string[]): Promise<void> {
+  const games = await getManualGames();
+  const existing = games.findIndex((g) => g.name === name);
+  if (existing >= 0) {
+    games[existing] = { name, paths };
+    return setManualGames(games);
+  }
+  games.push({ name, paths });
+  await setManualGames(games);
+}
+
+export async function removeManualGame(name: string): Promise<void> {
+  const games = await getManualGames();
+  await setManualGames(games.filter((g) => g.name !== name));
+}
+
 // Sync fingerprints
 export async function getSyncFingerprints(): Promise<Record<string, GameSyncFingerprint>> {
   const s = await getStore();
