@@ -10,15 +10,15 @@ const ESTIMATED_HEIGHT = 60;
 
 export type SavesListProps = {
   games: Game[];
-  scrollRef: React.RefObject<HTMLDivElement | null>;
+  scrollElement: HTMLDivElement | null;
 };
 
-export const SavesList = ({ games, scrollRef }: SavesListProps) => {
+export const SavesList = ({ games, scrollElement }: SavesListProps) => {
   const { t } = useTranslation();
 
   const virtualizer = useVirtualizer({
     count: games.length,
-    getScrollElement: () => scrollRef.current,
+    getScrollElement: () => scrollElement,
     estimateSize: () => ESTIMATED_HEIGHT,
     overscan: 10,
     gap: 8,

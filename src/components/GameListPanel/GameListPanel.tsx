@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,7 +12,8 @@ export type GameListPanelProps = {
 
 export const GameListPanel = ({ games, isLoading }: GameListPanelProps) => {
   const { t } = useTranslation();
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null);
+  const scrollRef = useCallback((node: HTMLDivElement | null) => setScrollElement(node), []);
 
   if (isLoading) {
     return (
@@ -26,7 +27,7 @@ export const GameListPanel = ({ games, isLoading }: GameListPanelProps) => {
   return (
     <ScrollArea className="flex-1 overflow-hidden" viewportRef={scrollRef}>
       <div className="px-4 pb-4">
-        <SavesList games={games} scrollRef={scrollRef} />
+        <SavesList games={games} scrollElement={scrollElement} />
       </div>
     </ScrollArea>
   );

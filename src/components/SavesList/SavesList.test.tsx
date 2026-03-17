@@ -17,11 +17,11 @@ vi.mock("@tanstack/react-virtual", () => ({
   }),
 }));
 
-const Wrapper = (props: Omit<SavesListProps, "scrollRef">) => {
+const Wrapper = (props: Omit<SavesListProps, "scrollElement">) => {
   const ref = useRef<HTMLDivElement>(null);
   return (
     <div ref={ref} style={{ height: 400, overflow: "auto" }}>
-      <SavesList {...props} scrollRef={ref} />
+      <SavesList {...props} scrollElement={ref.current} />
     </div>
   );
 };
