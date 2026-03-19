@@ -9,7 +9,6 @@ mod types;
 
 pub use types::DetectedGame;
 
-use std::collections::HashMap;
 use std::path::Path;
 
 use files::{collect_save_files, scan_candidates};
@@ -17,7 +16,6 @@ use gog::find_gog_app_roots;
 use manifest::{fetch_manifest, resolve_candidates};
 use resolve::{get_home, get_username};
 use steam::{find_steam_app_roots, find_steam_libraries};
-use types::ManifestEntry;
 
 pub fn scan_manual_game_blocking(name: String, paths: Vec<String>) -> DetectedGame {
     let save_files: Vec<_> = paths
@@ -39,10 +37,7 @@ pub fn scan_manual_game_blocking(name: String, paths: Vec<String>) -> DetectedGa
 }
 
 pub fn scan_games_blocking() -> Result<Vec<DetectedGame>, String> {
-    let body = fetch_manifest()?;
-
-    let manifest: HashMap<String, ManifestEntry> =
-        serde_yaml::from_str(&body).map_err(|e| format!("Failed to parse manifest: {}", e))?;
+    let manifest = fetch_manifest()?;
 
     let home = get_home()
         .map(|h| h.to_string_lossy().to_string())

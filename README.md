@@ -6,7 +6,7 @@ QSave detects installed games using the [Ludusavi](https://github.com/mtkennerly
 
 ## Features
 
-- **Auto-detection** — Scans your system for installed games and their save files (~15,000 games supported)
+- **Auto-detection** — Scans your system for installed games and their save files using multiple game manifests
 - **Real-time watching** — Monitors save directories for changes with debounced updates
 - **Google Drive sync** — Upload saves with automatic versioning via Drive revisions
 - **System tray** — Runs in the background, closing the window hides to tray
@@ -82,6 +82,16 @@ git push origin v0.1.0
 ```
 
 This creates a draft GitHub release with macOS (ARM + Intel) and Windows installers.
+
+## Game Data
+
+QSave uses the following manifests to detect games and their save file locations:
+
+- [Ludusavi Manifest](https://github.com/mtkennerly/ludusavi-manifest) — primary game database, sourced from [PCGamingWiki](https://www.pcgamingwiki.com/)
+- [Ludusavi Extra Manifests](https://github.com/BloodShed-Oni/ludusavi-extra-manifests) — community-contributed games missing from the primary manifest
+- [Ludusavi Manifests (hvmzx)](https://github.com/hvmzx/ludusavi-manifests) — additional save paths for existing games
+
+The primary manifest data comes from PCGamingWiki. If you find missing or incorrect save locations, please contribute back to the [wiki](https://www.pcgamingwiki.com/) so improvements benefit everyone.
 
 ## License
 
