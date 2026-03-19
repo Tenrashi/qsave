@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { act } from "@testing-library/react";
 import {
   renderWithProviders,
   screen,
@@ -175,7 +176,9 @@ describe("RestoreContent", () => {
       expect(screen.getByText("restore.restoring")).toBeInTheDocument();
     });
 
-    resolveRestore!(defaultRestoreRecord);
+    await act(() => {
+      resolveRestore!(defaultRestoreRecord);
+    });
   });
 
   it("sets error game status when restore mutation fails", async () => {

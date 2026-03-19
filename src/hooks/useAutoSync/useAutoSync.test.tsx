@@ -222,9 +222,10 @@ describe("useAutoSync", () => {
     useSyncStore.setState({ watchedGames: { "The Sims 4": true } });
     mockRescanGame.mockResolvedValueOnce(sims4Game);
     mockComputeGameHash.mockReturnValueOnce("new-hash");
-    mockSyncGame.mockResolvedValueOnce({
+    const syncPromise = Promise.resolve({
       status: SYNC_STATUS.success,
     } as SyncRecord);
+    mockSyncGame.mockReturnValueOnce(syncPromise);
 
     renderHook(() => useAutoSync([sims4Game], true), {
       wrapper: createWrapper(),
@@ -235,8 +236,9 @@ describe("useAutoSync", () => {
     });
 
     const syncCallback = mockScheduleAutoSync.mock.calls[0][1];
-    await act(() => {
+    await act(async () => {
       syncCallback();
+      await syncPromise;
     });
 
     expect(mockSyncGame).toHaveBeenCalledWith(sims4Game);
@@ -270,9 +272,10 @@ describe("useAutoSync", () => {
     useAuthStore.setState({ auth: { isAuthenticated: true } });
     useSyncStore.setState({ watchedGames: { "The Sims 4": true } });
     mockRescanGame.mockResolvedValueOnce(sims4Game);
-    mockSyncGame.mockResolvedValueOnce({
+    const syncPromise = Promise.resolve({
       status: SYNC_STATUS.error,
     } as SyncRecord);
+    mockSyncGame.mockReturnValueOnce(syncPromise);
 
     renderHook(() => useAutoSync([sims4Game], true), {
       wrapper: createWrapper(),
@@ -283,8 +286,9 @@ describe("useAutoSync", () => {
     });
 
     const syncCallback = mockScheduleAutoSync.mock.calls[0][1];
-    await act(() => {
+    await act(async () => {
       syncCallback();
+      await syncPromise;
     });
 
     expect(useSyncStore.getState().gameStatuses["The Sims 4"]).toBe(
