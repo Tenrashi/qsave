@@ -4,7 +4,7 @@ import { sims4Game } from "@/test/mocks/games";
 import { Button } from "@/components/ui/button";
 import { RestoreDialog } from "./RestoreDialog";
 
-vi.mock("./RestoreContent", () => ({
+vi.mock("./RestoreContent/RestoreContent", () => ({
   RestoreContent: () => <div data-testid="restore-content" />,
 }));
 

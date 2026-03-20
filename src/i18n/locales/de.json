@@ -69,7 +69,13 @@
     "tooltip": "Letzte Sicherung wiederherstellen",
     "tooltipPick": "Eine Sicherung zum Wiederherstellen wählen",
     "confirmTitle": "Letzte Sicherung wiederherstellen?",
-    "close": "Schließen"
+    "close": "Schließen",
+    "deleteTitle": "Dieses Backup löschen?",
+    "deleteDescription": "Dieses Backup wird dauerhaft aus der Cloud gelöscht. Dies kann nicht rückgängig gemacht werden.",
+    "delete": "Löschen",
+    "deleting": "Wird gelöscht...",
+    "deleteSuccess": "Backup gelöscht",
+    "deleteError": "Backup konnte nicht gelöscht werden"
   },
   "settings": {
     "language": "Sprache"

@@ -3,7 +3,7 @@ import { renderWithProviders, screen, setupUser } from "@/test/test-utils";
 import { RemoveGameDialog } from "./RemoveGameDialog";
 import { Button } from "@/components/ui/button";
 
-vi.mock("./RemoveGameContent", () => ({
+vi.mock("./RemoveGameContent/RemoveGameContent", () => ({
   RemoveGameContent: () => <div data-testid="remove-game-content" />,
 }));
 
