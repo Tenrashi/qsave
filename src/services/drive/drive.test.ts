@@ -5,6 +5,7 @@ import {
   ensureGameFolder,
   listBackedUpGameNames,
   listGameBackups,
+  deleteGameBackup,
   downloadBackup,
   uploadGameArchive,
 } from "./drive";
@@ -251,6 +252,38 @@ describe("drive", () => {
 
       expect(result[0].id).toBe("2");
       expect(result[1].id).toBe("1");
+    });
+  });
+
+  describe("deleteGameBackup", () => {
+    it("deletes file by ID", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(""),
+      });
+
+      await deleteGameBackup("file-123");
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("/files/file-123"),
+        expect.objectContaining({ method: "DELETE" }),
+      );
+    });
+
+    it("wraps errors with fileId context", async () => {
+      mockFetch.mockResolvedValueOnce(errorResponse(404));
+
+      await expect(deleteGameBackup("file-123")).rejects.toThrow(
+        'Failed to delete backup "file-123"',
+      );
+    });
+
+    it("handles non-Error throw in wrapping", async () => {
+      mockGetValidToken.mockRejectedValueOnce("auth expired");
+
+      await expect(deleteGameBackup("file-123")).rejects.toThrow(
+        'Failed to delete backup "file-123"',
+      );
     });
   });
 

@@ -69,7 +69,13 @@
     "tooltip": "Ripristina ultimo backup",
     "tooltipPick": "Scegli un backup da ripristinare",
     "confirmTitle": "Ripristinare l'ultimo backup?",
-    "close": "Chiudi"
+    "close": "Chiudi",
+    "deleteTitle": "Eliminare questo backup?",
+    "deleteDescription": "Questo backup verrà eliminato definitivamente dal cloud. Questa azione non può essere annullata.",
+    "delete": "Elimina",
+    "deleting": "Eliminazione...",
+    "deleteSuccess": "Backup eliminato",
+    "deleteError": "Eliminazione del backup non riuscita"
   },
   "settings": {
     "language": "Lingua"

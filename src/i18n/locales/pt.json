@@ -69,7 +69,13 @@
     "tooltip": "Restaurar último backup",
     "tooltipPick": "Escolher um backup para restaurar",
     "confirmTitle": "Restaurar último backup?",
-    "close": "Fechar"
+    "close": "Fechar",
+    "deleteTitle": "Excluir este backup?",
+    "deleteDescription": "Este backup será excluído permanentemente da nuvem. Esta ação não pode ser desfeita.",
+    "delete": "Excluir",
+    "deleting": "Excluindo...",
+    "deleteSuccess": "Backup excluído",
+    "deleteError": "Falha ao excluir o backup"
   },
   "settings": {
     "language": "Idioma"

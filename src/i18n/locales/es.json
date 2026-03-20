@@ -69,7 +69,13 @@
     "tooltip": "Restaurar última copia de seguridad",
     "tooltipPick": "Elegir una copia de seguridad para restaurar",
     "confirmTitle": "¿Restaurar última copia de seguridad?",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "deleteTitle": "¿Eliminar esta copia de seguridad?",
+    "deleteDescription": "Esta copia de seguridad se eliminará permanentemente de la nube. Esta acción no se puede deshacer.",
+    "delete": "Eliminar",
+    "deleting": "Eliminando...",
+    "deleteSuccess": "Copia de seguridad eliminada",
+    "deleteError": "Error al eliminar la copia de seguridad"
   },
   "settings": {
     "language": "Idioma"

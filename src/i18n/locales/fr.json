@@ -69,7 +69,13 @@
     "tooltip": "Restaurer la dernière sauvegarde",
     "tooltipPick": "Choisir une sauvegarde à restaurer",
     "confirmTitle": "Restaurer la dernière sauvegarde ?",
-    "close": "Fermer"
+    "close": "Fermer",
+    "deleteTitle": "Supprimer cette sauvegarde ?",
+    "deleteDescription": "Cette sauvegarde sera définitivement supprimée du cloud. Cette action est irréversible.",
+    "delete": "Supprimer",
+    "deleting": "Suppression...",
+    "deleteSuccess": "Sauvegarde supprimée",
+    "deleteError": "Échec de la suppression"
   },
   "settings": {
     "language": "Langue"

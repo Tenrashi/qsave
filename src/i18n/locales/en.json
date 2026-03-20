@@ -69,7 +69,13 @@
     "tooltip": "Restore latest backup",
     "tooltipPick": "Choose a backup to restore",
     "confirmTitle": "Restore latest backup?",
-    "close": "Close"
+    "close": "Close",
+    "deleteTitle": "Delete this backup?",
+    "deleteDescription": "This backup will be permanently deleted from the cloud. This can't be undone.",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "deleteSuccess": "Backup deleted",
+    "deleteError": "Failed to delete backup"
   },
   "settings": {
     "language": "Language"
