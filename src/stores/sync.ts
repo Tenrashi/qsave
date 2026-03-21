@@ -24,6 +24,7 @@ type SyncStore = {
   backedUpGames: Set<string>;
   backedUpGamesLoaded: boolean;
   loadBackedUpGames: () => Promise<void>;
+  refreshBackedUpGames: () => Promise<void>;
   markGameBackedUp: (gameName: string) => void;
   hasBackup: (gameName: string) => boolean;
 };
@@ -36,7 +37,9 @@ export const useSyncStore = create<SyncStore>((set, get) => ({
   backedUpGamesLoaded: false,
 
   setGameStatus: (gameName, status) =>
-    set((state) => ({ gameStatuses: { ...state.gameStatuses, [gameName]: status } })),
+    set((state) => ({
+      gameStatuses: { ...state.gameStatuses, [gameName]: status },
+    })),
 
   initWatchPreferences: async () => {
     const names = await getWatchedGames();
@@ -66,6 +69,11 @@ export const useSyncStore = create<SyncStore>((set, get) => ({
 
   loadBackedUpGames: async () => {
     if (get().backedUpGamesLoaded) return;
+    const names = await listBackedUpGameNames();
+    set({ backedUpGames: new Set(names), backedUpGamesLoaded: true });
+  },
+
+  refreshBackedUpGames: async () => {
     const names = await listBackedUpGameNames();
     set({ backedUpGames: new Set(names), backedUpGamesLoaded: true });
   },

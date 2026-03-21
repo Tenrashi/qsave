@@ -14,6 +14,7 @@ import {
   eldenRingGame,
   manualGame,
   emptyManualGame,
+  cloudOnlyGame,
 } from "@/test/mocks/games";
 import { computeGameHash } from "@/lib/hash/hash";
 import { GameCard, type GameCardProps } from "./GameCard";
@@ -296,5 +297,46 @@ describe("GameCard", () => {
 
     renderGameCard();
     expect(screen.getByRole("img", { name: "sync error" })).toBeInTheDocument();
+  });
+
+  describe("cloud-only games", () => {
+    it("shows cloud badge for cloud-only games", () => {
+      renderGameCard({ game: cloudOnlyGame });
+      expect(screen.getByText("games.cloudBadge")).toBeInTheDocument();
+    });
+
+    it("does not show cloud badge for local games", () => {
+      renderGameCard();
+      expect(screen.queryByText("games.cloudBadge")).not.toBeInTheDocument();
+    });
+
+    it("shows cloud hint text instead of file size", () => {
+      renderGameCard({ game: cloudOnlyGame });
+      expect(screen.getByText("games.cloudOnlyHint")).toBeInTheDocument();
+      expect(screen.queryByText(/bytes/)).not.toBeInTheDocument();
+    });
+
+    it("shows restore button for cloud-only games", () => {
+      renderGameCard({ game: cloudOnlyGame });
+      expect(
+        screen.getByRole("button", { name: "restore.tooltipPick" }),
+      ).toBeInTheDocument();
+    });
+
+    it("does not show sync button for cloud-only games", () => {
+      authenticateUser();
+      renderGameCard({ game: cloudOnlyGame });
+      expect(screen.queryByText("games.sync")).not.toBeInTheDocument();
+    });
+
+    it("does not show watch toggle for cloud-only games", () => {
+      authenticateUser();
+      renderGameCard({ game: cloudOnlyGame });
+      expect(
+        screen.queryByRole("button", {
+          name: /games\.watchTooltip|games\.unwatchTooltip/,
+        }),
+      ).not.toBeInTheDocument();
+    });
   });
 });
