@@ -6,6 +6,10 @@ import { useSyncHistory } from "@/hooks/queries/useSyncHistory/useSyncHistory";
 import { useAutoSync } from "@/hooks/useAutoSync/useAutoSync";
 import { useGameDetectionNotify } from "@/hooks/useGameDetectionNotify/useGameDetectionNotify";
 import type { Game } from "@/domain/types";
+import {
+  getHideSteamCloud,
+  setHideSteamCloud as persistHideSteamCloud,
+} from "@/lib/store/store";
 import { AppHeader } from "@/components/AppHeader/AppHeader";
 import { AuthStatus } from "@/components/AuthStatus/AuthStatus";
 import { GameToolbar } from "@/components/GameToolbar/GameToolbar";
@@ -34,6 +38,7 @@ const App = () => {
     init();
     initWatchPreferences();
     initSyncFingerprints();
+    getHideSteamCloud().then(setHideSteamCloud);
   }, []);
 
   useEffect(() => {
@@ -90,7 +95,12 @@ const App = () => {
         search={search}
         onSearchChange={setSearch}
         hideSteamCloud={hideSteamCloud}
-        onToggleHideSteamCloud={() => setHideSteamCloud((prev) => !prev)}
+        onToggleHideSteamCloud={() =>
+          setHideSteamCloud((prev) => {
+            persistHideSteamCloud(!prev);
+            return !prev;
+          })
+        }
       />
       {games.error && <ErrorBanner message={games.error.message} />}
       <GameListPanel games={filteredGames} isLoading={games.isLoading} />

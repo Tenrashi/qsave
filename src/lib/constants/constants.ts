@@ -13,6 +13,7 @@ export const STORE_KEYS = {
   syncFingerprints: "syncFingerprints",
   rootFolder: "__root__",
   manualGames: "manualGames",
+  hideSteamCloud: "hideSteamCloud",
 } as const;
 
 export const TAURI_COMMANDS = {

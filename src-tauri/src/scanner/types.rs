@@ -28,6 +28,14 @@ pub(crate) struct ManifestEntry {
     pub _rest: HashMap<String, serde_yaml::Value>,
 }
 
+#[derive(Debug)]
+pub(crate) struct ResolvedCandidate {
+    pub name: String,
+    pub steam_id: Option<u64>,
+    pub paths: Vec<String>,
+    pub has_steam_cloud: bool,
+}
+
 #[derive(Debug, Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DetectedGame {

@@ -35,6 +35,8 @@ vi.mock("@/lib/store/store", () => ({
   getSyncFingerprints: vi.fn(() => Promise.resolve({})),
   setWatchedGames: vi.fn(),
   setSyncFingerprint: vi.fn(),
+  getHideSteamCloud: vi.fn(() => Promise.resolve(false)),
+  setHideSteamCloud: vi.fn(),
 }));
 
 vi.mock("@/hooks/useAutoSync/useAutoSync", () => ({
