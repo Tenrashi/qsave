@@ -53,7 +53,8 @@ export const useRestoreBackup = (game: Game) => {
             gameA.name.localeCompare(gameB.name),
           ),
         );
-      } catch {
+      } catch (error) {
+        console.error("Post-restore update failed:", error);
         setGameStatus(game.name, SYNC_STATUS.error);
       }
     },

@@ -44,8 +44,8 @@ export const RestoreBody = ({ game, quick, open }: RestoreBodyProps) => {
     try {
       const folder = await invoke<string | null>(TAURI_COMMANDS.pickFolder);
       if (folder) setTargetPath(folder);
-    } catch {
-      // user cancelled or dialog unavailable
+    } catch (error) {
+      console.error("Folder picker failed:", error);
     }
   };
 

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Upload,
   Download,
@@ -19,6 +20,10 @@ import {
 } from "@/components/ui/tooltip";
 import { SYNC_STATUS } from "@/domain/types";
 import type { Game } from "@/domain/types";
+import { QUERY_KEYS } from "@/lib/constants/constants";
+import { syncGame } from "@/services/sync/sync";
+import { computeGameHash } from "@/lib/hash/hash";
+import { removeManualGame } from "@/lib/store/store";
 import { useAuthStore } from "@/stores/auth";
 import { useSyncStore } from "@/stores/sync";
 import { dateFnsLocales } from "@/lib/date-locales/date-locales";
@@ -28,25 +33,28 @@ import { formatSize } from "../utils/formatSize";
 
 export type LocalGameActionsProps = {
   game: Game;
-  onRemove: () => void;
-  onSync: () => void;
 };
 
-export const LocalGameActions = ({
-  game,
-  onRemove,
-  onSync,
-}: LocalGameActionsProps) => {
+export const LocalGameActions = ({ game }: LocalGameActionsProps) => {
   const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
   const { auth } = useAuthStore();
-  const { gameStatuses, isGameWatched, toggleGameWatch, hasBackup } =
-    useSyncStore();
+  const {
+    gameStatuses,
+    setGameStatus,
+    updateSyncFingerprint,
+    markGameBackedUp,
+    isGameWatched,
+    toggleGameWatch,
+    hasBackup,
+  } = useSyncStore();
   const locale = dateFnsLocales[i18n.language] ?? enUS;
 
   const status = gameStatuses[game.name] ?? SYNC_STATUS.idle;
   const isBusy =
     status === SYNC_STATUS.syncing || status === SYNC_STATUS.restoring;
   const watched = isGameWatched(game.name);
+  const currentHash = computeGameHash(game.saveFiles);
 
   const totalSize = game.saveFiles.reduce(
     (sum, file) => sum + file.sizeBytes,
@@ -56,6 +64,37 @@ export const LocalGameActions = ({
     (latest, file) => (file.lastModified > latest ? file.lastModified : latest),
     new Date(0),
   );
+
+  const handleRemove = async () => {
+    try {
+      await removeManualGame(game.name);
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.games });
+      queryClient.setQueryData<Game[]>(QUERY_KEYS.games, (prev = []) =>
+        prev.filter((existing) => existing.name !== game.name),
+      );
+    } catch {
+      // store write failed — ignore
+    }
+  };
+
+  const handleSync = async () => {
+    setGameStatus(game.name, SYNC_STATUS.syncing);
+    try {
+      const result = await syncGame(game);
+      const newStatus =
+        result.status === SYNC_STATUS.error
+          ? SYNC_STATUS.error
+          : SYNC_STATUS.success;
+      setGameStatus(game.name, newStatus);
+      if (newStatus === SYNC_STATUS.success) {
+        await updateSyncFingerprint(game.name, currentHash);
+        markGameBackedUp(game.name);
+      }
+    } catch {
+      setGameStatus(game.name, SYNC_STATUS.error);
+    }
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.syncHistory });
+  };
 
   return (
     <>
@@ -71,7 +110,7 @@ export const LocalGameActions = ({
       {game.isManual && (
         <Tooltip>
           <RemoveGameDialog
-            onConfirm={onRemove}
+            onConfirm={handleRemove}
             trigger={
               <TooltipTrigger
                 render={
@@ -159,7 +198,7 @@ export const LocalGameActions = ({
           <Button
             size="sm"
             variant="secondary"
-            onClick={onSync}
+            onClick={handleSync}
             disabled={isBusy}
           >
             {status === SYNC_STATUS.syncing ? (

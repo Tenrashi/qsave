@@ -23,8 +23,7 @@ type SyncStore = {
 
   backedUpGames: Set<string>;
   backedUpGamesLoaded: boolean;
-  loadBackedUpGames: () => Promise<void>;
-  refreshBackedUpGames: () => Promise<void>;
+  loadBackedUpGames: (force?: boolean) => Promise<void>;
   markGameBackedUp: (gameName: string) => void;
   hasBackup: (gameName: string) => boolean;
 };
@@ -67,13 +66,8 @@ export const useSyncStore = create<SyncStore>((set, get) => ({
     set({ syncFingerprints: fingerprints });
   },
 
-  loadBackedUpGames: async () => {
-    if (get().backedUpGamesLoaded) return;
-    const names = await listBackedUpGameNames();
-    set({ backedUpGames: new Set(names), backedUpGamesLoaded: true });
-  },
-
-  refreshBackedUpGames: async () => {
+  loadBackedUpGames: async (force = false) => {
+    if (!force && get().backedUpGamesLoaded) return;
     const names = await listBackedUpGameNames();
     set({ backedUpGames: new Set(names), backedUpGamesLoaded: true });
   },

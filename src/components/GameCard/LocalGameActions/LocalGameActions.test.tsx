@@ -1,26 +1,48 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderWithProviders, screen, setupUser } from "@/test/test-utils";
+import {
+  renderWithProviders,
+  screen,
+  setupUser,
+  waitFor,
+} from "@/test/test-utils";
 import { useAuthStore } from "@/stores/auth";
 import { useSyncStore } from "@/stores/sync";
-import { SYNC_STATUS } from "@/domain/types";
+import { SYNC_STATUS, RECORD_STATUS } from "@/domain/types";
+import type { SyncRecord } from "@/domain/types";
 import { sims4Game, manualGame } from "@/test/mocks/games";
-import {
-  LocalGameActions,
-  type LocalGameActionsProps,
-} from "./LocalGameActions";
+import { LocalGameActions } from "./LocalGameActions";
+
+const { mockSyncGame, mockRemoveManualGame } = vi.hoisted(() => ({
+  mockSyncGame: vi.fn(() =>
+    Promise.resolve({
+      id: "sync-1",
+      gameName: "The Sims 4",
+      fileName: "The Sims 4.zip",
+      syncedAt: new Date(),
+      driveFileId: "file-123",
+      revisionCount: 1,
+      status: RECORD_STATUS.success,
+    } as SyncRecord),
+  ),
+  mockRemoveManualGame: vi.fn(),
+}));
 
 vi.mock("../utils/formatSize", () => ({
   formatSize: (bytes: number) => `${bytes} bytes`,
 }));
 
-const defaultProps: LocalGameActionsProps = {
-  game: sims4Game,
-  onRemove: vi.fn(),
-  onSync: vi.fn(),
-};
+vi.mock("@/services/sync/sync", () => ({
+  syncGame: mockSyncGame,
+}));
 
-const renderActions = (overrides: Partial<LocalGameActionsProps> = {}) =>
-  renderWithProviders(<LocalGameActions {...defaultProps} {...overrides} />);
+vi.mock("@/lib/store/store", () => ({
+  removeManualGame: mockRemoveManualGame,
+  setWatchedGames: vi.fn(),
+  setSyncFingerprint: vi.fn(),
+}));
+
+const renderActions = (game = sims4Game) =>
+  renderWithProviders(<LocalGameActions game={game} />);
 
 const authenticateUser = () => {
   useAuthStore.setState({
@@ -65,14 +87,6 @@ describe("LocalGameActions", () => {
     expect(screen.getByText("games.sync")).toBeInTheDocument();
   });
 
-  it("calls onSync when sync button is clicked", async () => {
-    authenticateUser();
-    const onSync = vi.fn();
-    renderActions({ onSync });
-    await user.click(screen.getByText("games.sync"));
-    expect(onSync).toHaveBeenCalledOnce();
-  });
-
   it("shows watch toggle when authenticated", () => {
     authenticateUser();
     renderActions();
@@ -83,8 +97,20 @@ describe("LocalGameActions", () => {
     ).toBeInTheDocument();
   });
 
+  it("toggles watch state when clicking the eye icon", async () => {
+    authenticateUser();
+    renderActions();
+
+    const toggle = screen.getByRole("button", {
+      name: /games\.watchTooltip|games\.unwatchTooltip/,
+    });
+    await user.click(toggle);
+
+    expect(useSyncStore.getState().watchedGames["The Sims 4"]).toBe(true);
+  });
+
   it("shows remove button for manual games", () => {
-    renderActions({ game: manualGame });
+    renderActions(manualGame);
     expect(
       screen.getByRole("button", { name: "games.removeGame" }),
     ).toBeInTheDocument();
@@ -95,6 +121,15 @@ describe("LocalGameActions", () => {
     expect(
       screen.queryByRole("button", { name: "games.removeGame" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("opens confirmation dialog when remove button is clicked", async () => {
+    renderActions(manualGame);
+    await user.click(screen.getByRole("button", { name: "games.removeGame" }));
+    expect(screen.getByText("games.removeConfirmTitle")).toBeInTheDocument();
+    expect(
+      screen.getByText("games.removeConfirmDescription"),
+    ).toBeInTheDocument();
   });
 
   it("shows restore buttons when game has backup", () => {
@@ -132,5 +167,50 @@ describe("LocalGameActions", () => {
     expect(
       screen.getByRole("button", { name: "restore.tooltip" }),
     ).toBeDisabled();
+  });
+
+  it("syncs game and updates status on success", async () => {
+    authenticateUser();
+    renderActions();
+
+    await user.click(screen.getByText("games.sync"));
+
+    await waitFor(() => {
+      expect(mockSyncGame).toHaveBeenCalledWith(sims4Game);
+      expect(useSyncStore.getState().gameStatuses["The Sims 4"]).toBe(
+        SYNC_STATUS.success,
+      );
+    });
+  });
+
+  it("sets error status when sync returns error record", async () => {
+    authenticateUser();
+    mockSyncGame.mockResolvedValueOnce({
+      status: RECORD_STATUS.error,
+      error: "upload failed",
+    } as SyncRecord);
+
+    renderActions();
+    await user.click(screen.getByText("games.sync"));
+
+    await waitFor(() => {
+      expect(useSyncStore.getState().gameStatuses["The Sims 4"]).toBe(
+        SYNC_STATUS.error,
+      );
+    });
+  });
+
+  it("sets error status when sync throws", async () => {
+    authenticateUser();
+    mockSyncGame.mockRejectedValueOnce(new Error("network error"));
+
+    renderActions();
+    await user.click(screen.getByText("games.sync"));
+
+    await waitFor(() => {
+      expect(useSyncStore.getState().gameStatuses["The Sims 4"]).toBe(
+        SYNC_STATUS.error,
+      );
+    });
   });
 });

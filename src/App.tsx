@@ -16,8 +16,13 @@ import { StatusBar } from "@/components/StatusBar/StatusBar";
 
 const App = () => {
   const { init, auth } = useAuthStore();
-  const { initWatchPreferences, initSyncFingerprints, loadBackedUpGames } =
-    useSyncStore();
+  const {
+    initWatchPreferences,
+    initSyncFingerprints,
+    loadBackedUpGames,
+    backedUpGames,
+    backedUpGamesLoaded,
+  } = useSyncStore();
   const games = useGames();
   const history = useSyncHistory();
   const [search, setSearch] = useState("");
@@ -38,9 +43,6 @@ const App = () => {
 
   useAutoSync(games.data, watching);
   useGameDetectionNotify(games.data);
-
-  const { backedUpGames, backedUpGamesLoaded, refreshBackedUpGames } =
-    useSyncStore();
 
   const allGames = useMemo(() => {
     const localGames = games.data ?? [];
@@ -73,7 +75,7 @@ const App = () => {
         isFetching={games.isFetching}
         onRefresh={() => {
           games.refetch();
-          if (auth.isAuthenticated) refreshBackedUpGames();
+          if (auth.isAuthenticated) loadBackedUpGames(true);
         }}
       />
       <AuthStatus />

@@ -1,14 +1,10 @@
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { useSyncStore } from "@/stores/sync";
 import { SYNC_STATUS } from "@/domain/types";
 import type { Game } from "@/domain/types";
-import { QUERY_KEYS } from "@/lib/constants/constants";
-import { syncGame } from "@/services/sync/sync";
 import { computeGameHash } from "@/lib/hash/hash";
-import { removeManualGame } from "@/lib/store/store";
 import { GameBanner } from "./GameBanner/GameBanner";
 import { CloudOnlyActions } from "./CloudOnlyActions/CloudOnlyActions";
 import { LocalGameActions } from "./LocalGameActions/LocalGameActions";
@@ -20,51 +16,13 @@ export type GameCardProps = {
 
 export const GameCard = memo(({ game }: GameCardProps) => {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
-  const {
-    gameStatuses,
-    setGameStatus,
-    syncFingerprints,
-    updateSyncFingerprint,
-    markGameBackedUp,
-  } = useSyncStore();
+  const { gameStatuses, syncFingerprints } = useSyncStore();
 
   const status = gameStatuses[game.name] ?? SYNC_STATUS.idle;
   const isBusy =
     status === SYNC_STATUS.syncing || status === SYNC_STATUS.restoring;
   const currentHash = computeGameHash(game.saveFiles);
   const isSynced = syncFingerprints[game.name]?.hash === currentHash;
-
-  const handleRemove = async () => {
-    try {
-      await removeManualGame(game.name);
-      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.games });
-      queryClient.setQueryData<Game[]>(QUERY_KEYS.games, (prev = []) =>
-        prev.filter((existing) => existing.name !== game.name),
-      );
-    } catch {
-      // store write failed — ignore
-    }
-  };
-
-  const handleSync = async () => {
-    setGameStatus(game.name, SYNC_STATUS.syncing);
-    try {
-      const result = await syncGame(game);
-      const newStatus =
-        result.status === SYNC_STATUS.error
-          ? SYNC_STATUS.error
-          : SYNC_STATUS.success;
-      setGameStatus(game.name, newStatus);
-      if (newStatus === SYNC_STATUS.success) {
-        await updateSyncFingerprint(game.name, currentHash);
-        markGameBackedUp(game.name);
-      }
-    } catch {
-      setGameStatus(game.name, SYNC_STATUS.error);
-    }
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.syncHistory });
-  };
 
   return (
     <Card className="overflow-hidden !py-0">
@@ -89,11 +47,7 @@ export const GameCard = memo(({ game }: GameCardProps) => {
             {game.isCloudOnly ? (
               <CloudOnlyActions game={game} status={status} isBusy={isBusy} />
             ) : (
-              <LocalGameActions
-                game={game}
-                onRemove={handleRemove}
-                onSync={handleSync}
-              />
+              <LocalGameActions game={game} />
             )}
           </div>
         </div>
