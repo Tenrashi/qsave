@@ -1,6 +1,13 @@
 import { load, type Store } from "@tauri-apps/plugin-store";
-import type { AuthState, SyncRecord, GameSyncFingerprint } from "@/domain/types";
-import { STORE_KEYS, MAX_SYNC_HISTORY_RECORDS } from "@/lib/constants/constants";
+import type {
+  AuthState,
+  SyncRecord,
+  GameSyncFingerprint,
+} from "@/domain/types";
+import {
+  STORE_KEYS,
+  MAX_SYNC_HISTORY_RECORDS,
+} from "@/lib/constants/constants";
 import type { ManualGameEntry } from "./store.types";
 
 let store: Store | null = null;
@@ -56,7 +63,8 @@ export const addSyncRecord = async (record: SyncRecord): Promise<void> => {
   try {
     const history = await getSyncHistory();
     history.unshift(record);
-    if (history.length > MAX_SYNC_HISTORY_RECORDS) history.length = MAX_SYNC_HISTORY_RECORDS;
+    if (history.length > MAX_SYNC_HISTORY_RECORDS)
+      history.length = MAX_SYNC_HISTORY_RECORDS;
     const s = await getStore();
     await s.set(STORE_KEYS.syncHistory, history);
   } catch {
@@ -65,20 +73,28 @@ export const addSyncRecord = async (record: SyncRecord): Promise<void> => {
 };
 
 // Drive folder IDs cache
-export const getDriveFolderId = async (gameName: string): Promise<string | undefined> => {
+export const getDriveFolderId = async (
+  gameName: string,
+): Promise<string | undefined> => {
   try {
     const s = await getStore();
-    const folders = await s.get<Record<string, string>>(STORE_KEYS.driveFolders);
+    const folders = await s.get<Record<string, string>>(
+      STORE_KEYS.driveFolders,
+    );
     return folders?.[gameName];
   } catch {
     return undefined;
   }
 };
 
-export const setDriveFolderId = async (gameName: string, folderId: string): Promise<void> => {
+export const setDriveFolderId = async (
+  gameName: string,
+  folderId: string,
+): Promise<void> => {
   try {
     const s = await getStore();
-    const folders = (await s.get<Record<string, string>>(STORE_KEYS.driveFolders)) ?? {};
+    const folders =
+      (await s.get<Record<string, string>>(STORE_KEYS.driveFolders)) ?? {};
     folders[gameName] = folderId;
     await s.set(STORE_KEYS.driveFolders, folders);
   } catch {
@@ -117,7 +133,9 @@ export const getManualGames = async (): Promise<ManualGameEntry[]> => {
   }
 };
 
-export const setManualGames = async (games: ManualGameEntry[]): Promise<void> => {
+export const setManualGames = async (
+  games: ManualGameEntry[],
+): Promise<void> => {
   try {
     const s = await getStore();
     await s.set(STORE_KEYS.manualGames, games);
@@ -126,7 +144,10 @@ export const setManualGames = async (games: ManualGameEntry[]): Promise<void> =>
   }
 };
 
-export const addManualGame = async (name: string, paths: string[]): Promise<void> => {
+export const addManualGame = async (
+  name: string,
+  paths: string[],
+): Promise<void> => {
   const games = await getManualGames();
   const existingIndex = games.findIndex((game) => game.name === name);
   if (existingIndex >= 0) {
@@ -142,20 +163,51 @@ export const removeManualGame = async (name: string): Promise<void> => {
   await setManualGames(games.filter((game) => game.name !== name));
 };
 
-// Sync fingerprints
-export const getSyncFingerprints = async (): Promise<Record<string, GameSyncFingerprint>> => {
+// Preferences
+export const getHideSteamCloud = async (): Promise<boolean> => {
   try {
     const s = await getStore();
-    return (await s.get<Record<string, GameSyncFingerprint>>(STORE_KEYS.syncFingerprints)) ?? {};
+    return (await s.get<boolean>(STORE_KEYS.hideSteamCloud)) ?? false;
+  } catch {
+    return false;
+  }
+};
+
+export const setHideSteamCloud = async (value: boolean): Promise<void> => {
+  try {
+    const s = await getStore();
+    await s.set(STORE_KEYS.hideSteamCloud, value);
+  } catch {
+    // store write failed — preference not persisted
+  }
+};
+
+// Sync fingerprints
+export const getSyncFingerprints = async (): Promise<
+  Record<string, GameSyncFingerprint>
+> => {
+  try {
+    const s = await getStore();
+    return (
+      (await s.get<Record<string, GameSyncFingerprint>>(
+        STORE_KEYS.syncFingerprints,
+      )) ?? {}
+    );
   } catch {
     return {};
   }
 };
 
-export const setSyncFingerprint = async (gameName: string, fingerprint: GameSyncFingerprint): Promise<void> => {
+export const setSyncFingerprint = async (
+  gameName: string,
+  fingerprint: GameSyncFingerprint,
+): Promise<void> => {
   try {
     const s = await getStore();
-    const all = (await s.get<Record<string, GameSyncFingerprint>>(STORE_KEYS.syncFingerprints)) ?? {};
+    const all =
+      (await s.get<Record<string, GameSyncFingerprint>>(
+        STORE_KEYS.syncFingerprints,
+      )) ?? {};
     all[gameName] = fingerprint;
     await s.set(STORE_KEYS.syncFingerprints, all);
   } catch {

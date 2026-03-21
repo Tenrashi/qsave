@@ -15,6 +15,8 @@ import {
   removeManualGame,
   getSyncFingerprints,
   setSyncFingerprint,
+  getHideSteamCloud,
+  setHideSteamCloud,
 } from "./store";
 import type { SyncRecord, GameSyncFingerprint } from "@/domain/types";
 
@@ -240,6 +242,38 @@ describe("store", () => {
       expect(mockSet).toHaveBeenCalledWith("manualGames", [
         { name: "Keep", paths: ["/a"] },
       ]);
+    });
+  });
+
+  describe("hideSteamCloud preference", () => {
+    it("returns persisted value", async () => {
+      mockGet.mockResolvedValueOnce(true);
+
+      expect(await getHideSteamCloud()).toBe(true);
+    });
+
+    it("returns false when not stored", async () => {
+      mockGet.mockResolvedValueOnce(null);
+
+      expect(await getHideSteamCloud()).toBe(false);
+    });
+
+    it("returns false on error", async () => {
+      mockGet.mockRejectedValueOnce(new Error("fail"));
+
+      expect(await getHideSteamCloud()).toBe(false);
+    });
+
+    it("persists the value", async () => {
+      await setHideSteamCloud(true);
+
+      expect(mockSet).toHaveBeenCalledWith("hideSteamCloud", true);
+    });
+
+    it("does not throw on set error", async () => {
+      mockSet.mockRejectedValueOnce(new Error("fail"));
+
+      await expect(setHideSteamCloud(true)).resolves.toBeUndefined();
     });
   });
 

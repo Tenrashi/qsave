@@ -3,7 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use super::resolve::resolve_path;
-use super::types::ManifestEntry;
+use super::types::{ManifestEntry, ResolvedCandidate};
 
 const APP_ID: &str = "com.qsave.app";
 
@@ -96,16 +96,21 @@ fn merge_manifests(
 
         match base.entry(name) {
             std::collections::hash_map::Entry::Occupied(mut occupied) => {
-                let existing_files = occupied.get_mut().files.get_or_insert_with(HashMap::new);
+                let existing = occupied.get_mut();
+                let existing_files = existing.files.get_or_insert_with(HashMap::new);
                 extra_files.into_iter().for_each(|(path, value)| {
                     existing_files.entry(path).or_insert(value);
                 });
+                if existing.cloud.is_none() {
+                    existing.cloud = entry.cloud;
+                }
             }
             std::collections::hash_map::Entry::Vacant(vacant) => {
                 vacant.insert(ManifestEntry {
                     files: Some(extra_files),
                     steam: entry.steam,
                     gog: entry.gog,
+                    cloud: entry.cloud,
                     _rest: entry._rest,
                 });
             }
@@ -132,13 +137,14 @@ pub fn resolve_candidates(
     username: &str,
     steam_roots: &HashMap<u64, PathBuf>,
     gog_roots: &HashMap<u64, PathBuf>,
-) -> Vec<(String, Option<u64>, Vec<String>)> {
+) -> Vec<ResolvedCandidate> {
     manifest
         .into_iter()
         .filter_map(|(name, entry)| {
             let files = entry.files?;
             let steam_id = entry.steam.and_then(|s| s.id);
             let gog_id = entry.gog.and_then(|g| g.id);
+            let has_steam_cloud = entry.cloud.map_or(false, |c| c.steam);
             let root = steam_id
                 .and_then(|id| steam_roots.get(&id))
                 .or_else(|| gog_id.and_then(|id| gog_roots.get(&id)))
@@ -158,7 +164,12 @@ pub fn resolve_candidates(
                 return None;
             }
 
-            Some((name, steam_id, paths))
+            Some(ResolvedCandidate {
+                name,
+                steam_id,
+                paths,
+                has_steam_cloud,
+            })
         })
         .collect()
 }
@@ -329,6 +340,7 @@ GameB:
             files: None,
             steam: None,
             gog: None,
+            cloud: None,
             _rest: HashMap::new(),
         });
 
@@ -342,6 +354,48 @@ GameA:
 
         let files = base["GameA"].files.as_ref().unwrap();
         assert!(files.contains_key("<home>/new_path"));
+    }
+
+    #[test]
+    fn merge_carries_over_cloud_from_extra() {
+        let mut base = parse_yaml(r#"
+GameA:
+  files:
+    <home>/saves: {}
+"#);
+        let extra = parse_yaml(r#"
+GameA:
+  cloud:
+    steam: true
+  files:
+    <home>/extra: {}
+"#);
+
+        merge_manifests(&mut base, extra);
+
+        assert!(base["GameA"].cloud.as_ref().unwrap().steam);
+    }
+
+    #[test]
+    fn merge_does_not_overwrite_existing_cloud() {
+        let mut base = parse_yaml(r#"
+GameA:
+  cloud:
+    steam: true
+  files:
+    <home>/saves: {}
+"#);
+        let extra = parse_yaml(r#"
+GameA:
+  cloud:
+    steam: false
+  files:
+    <home>/extra: {}
+"#);
+
+        merge_manifests(&mut base, extra);
+
+        assert!(base["GameA"].cloud.as_ref().unwrap().steam);
     }
 
     // -- existing tests --
@@ -390,8 +444,8 @@ GameB:
         let candidates = resolve_candidates(manifest, "/home/user", "user", &HashMap::new(), &HashMap::new());
 
         assert_eq!(candidates.len(), 2);
-        let game_b = candidates.iter().find(|(name, _, _)| name == "GameB").unwrap();
-        assert!(game_b.2[0].contains('*'));
+        let game_b = candidates.iter().find(|c| c.name == "GameB").unwrap();
+        assert!(game_b.paths[0].contains('*'));
     }
 
     #[test]
@@ -408,7 +462,7 @@ GameB:
         let candidates = resolve_candidates(manifest, "/home/user", "user", &HashMap::new(), &HashMap::new());
 
         assert_eq!(candidates.len(), 1);
-        assert_eq!(candidates[0].0, "GameA");
+        assert_eq!(candidates[0].name, "GameA");
     }
 
     #[test]
@@ -426,7 +480,7 @@ SteamGame:
         let candidates = resolve_candidates(manifest, "/home/user", "user", &roots, &HashMap::new());
 
         assert_eq!(candidates.len(), 1);
-        assert_eq!(candidates[0].2, vec!["/games/SteamGame/saves"]);
+        assert_eq!(candidates[0].paths, vec!["/games/SteamGame/saves"]);
     }
 
     #[test]
@@ -444,7 +498,7 @@ GogGame:
         let candidates = resolve_candidates(manifest, "/home/user", "user", &HashMap::new(), &gog_roots);
 
         assert_eq!(candidates.len(), 1);
-        assert_eq!(candidates[0].2, vec!["/games/GogGame/saves"]);
+        assert_eq!(candidates[0].paths, vec!["/games/GogGame/saves"]);
     }
 
     #[test]
@@ -466,7 +520,7 @@ MultiStoreGame:
         let candidates = resolve_candidates(manifest, "/home/user", "user", &steam_roots, &gog_roots);
 
         assert_eq!(candidates.len(), 1);
-        assert_eq!(candidates[0].2, vec!["/steam/MultiStoreGame/saves"]);
+        assert_eq!(candidates[0].paths, vec!["/steam/MultiStoreGame/saves"]);
     }
 
     #[test]

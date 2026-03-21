@@ -4,7 +4,7 @@ use std::path::Path;
 use std::time::SystemTime;
 
 use super::localized_paths::resolve_localized_paths;
-use super::types::{DetectedGame, SaveFileInfo};
+use super::types::{DetectedGame, ResolvedCandidate, SaveFileInfo};
 
 pub fn collect_save_files(dir: &Path, game_name: &str) -> Vec<SaveFileInfo> {
     let Ok(entries) = fs::read_dir(dir) else {
@@ -42,18 +42,19 @@ pub fn collect_save_files(dir: &Path, game_name: &str) -> Vec<SaveFileInfo> {
         .collect()
 }
 
-pub fn scan_candidates(candidates: Vec<(String, Option<u64>, Vec<String>)>) -> Vec<DetectedGame> {
+pub fn scan_candidates(candidates: Vec<ResolvedCandidate>) -> Vec<DetectedGame> {
     let mut games: Vec<DetectedGame> = candidates
         .into_par_iter()
-        .filter_map(|(name, steam_id, paths)| {
-            let existing: Vec<_> = paths
+        .filter_map(|candidate| {
+            let existing: Vec<_> = candidate
+                .paths
                 .into_iter()
                 .flat_map(|path| resolve_localized_paths(&path))
                 .collect();
 
             let save_files: Vec<_> = existing
                 .iter()
-                .flat_map(|path| collect_save_files(Path::new(path), &name))
+                .flat_map(|path| collect_save_files(Path::new(path), &candidate.name))
                 .collect();
 
             if save_files.is_empty() {
@@ -61,10 +62,11 @@ pub fn scan_candidates(candidates: Vec<(String, Option<u64>, Vec<String>)>) -> V
             }
 
             Some(DetectedGame {
-                name,
-                steam_id,
+                name: candidate.name,
+                steam_id: candidate.steam_id,
                 save_paths: existing,
                 save_files,
+                has_steam_cloud: candidate.has_steam_cloud,
             })
         })
         .collect();
@@ -123,11 +125,12 @@ mod tests {
             .write_all(b"data")
             .unwrap();
 
-        let candidates = vec![(
-            "TestGame".to_string(),
-            Some(42u64),
-            vec![dir.path().to_string_lossy().to_string()],
-        )];
+        let candidates = vec![ResolvedCandidate {
+            name: "TestGame".to_string(),
+            steam_id: Some(42u64),
+            paths: vec![dir.path().to_string_lossy().to_string()],
+            has_steam_cloud: false,
+        }];
 
         let games = scan_candidates(candidates);
         assert_eq!(games.len(), 1);
@@ -138,11 +141,12 @@ mod tests {
 
     #[test]
     fn skips_nonexistent_paths() {
-        let candidates = vec![(
-            "MissingGame".to_string(),
-            None,
-            vec!["/nonexistent/path/very/unlikely".to_string()],
-        )];
+        let candidates = vec![ResolvedCandidate {
+            name: "MissingGame".to_string(),
+            steam_id: None,
+            paths: vec!["/nonexistent/path/very/unlikely".to_string()],
+            has_steam_cloud: false,
+        }];
 
         let games = scan_candidates(candidates);
         assert!(games.is_empty());
@@ -156,16 +160,18 @@ mod tests {
         File::create(dir_b.path().join("b.dat")).unwrap();
 
         let candidates = vec![
-            (
-                "Zelda".to_string(),
-                None,
-                vec![dir_a.path().to_string_lossy().to_string()],
-            ),
-            (
-                "Amnesia".to_string(),
-                None,
-                vec![dir_b.path().to_string_lossy().to_string()],
-            ),
+            ResolvedCandidate {
+                name: "Zelda".to_string(),
+                steam_id: None,
+                paths: vec![dir_a.path().to_string_lossy().to_string()],
+                has_steam_cloud: false,
+            },
+            ResolvedCandidate {
+                name: "Amnesia".to_string(),
+                steam_id: None,
+                paths: vec![dir_b.path().to_string_lossy().to_string()],
+                has_steam_cloud: false,
+            },
         ];
 
         let games = scan_candidates(candidates);

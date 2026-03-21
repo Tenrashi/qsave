@@ -12,13 +12,28 @@ pub(crate) struct GogInfo {
 }
 
 #[derive(Debug, Deserialize)]
+pub(crate) struct CloudInfo {
+    #[serde(default)]
+    pub steam: bool,
+}
+
+#[derive(Debug, Deserialize)]
 pub(crate) struct ManifestEntry {
     pub files: Option<HashMap<String, serde_yaml::Value>>,
     pub steam: Option<SteamInfo>,
     pub gog: Option<GogInfo>,
+    pub cloud: Option<CloudInfo>,
     #[allow(dead_code)]
     #[serde(flatten)]
     pub _rest: HashMap<String, serde_yaml::Value>,
+}
+
+#[derive(Debug)]
+pub(crate) struct ResolvedCandidate {
+    pub name: String,
+    pub steam_id: Option<u64>,
+    pub paths: Vec<String>,
+    pub has_steam_cloud: bool,
 }
 
 #[derive(Debug, Serialize, Clone)]
@@ -28,6 +43,7 @@ pub struct DetectedGame {
     pub steam_id: Option<u64>,
     pub save_paths: Vec<String>,
     pub save_files: Vec<SaveFileInfo>,
+    pub has_steam_cloud: bool,
 }
 
 #[derive(Debug, Serialize, Clone)]
