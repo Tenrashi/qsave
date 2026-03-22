@@ -43,7 +43,7 @@ vi.mock("@tauri-apps/plugin-http", () => ({
 
 // Prevent the real i18n init (with LanguageDetector) from running
 vi.mock("@/i18n", () => ({
-  default: {},
+  default: { t: (key: string) => key },
   languages: {
     en: "English",
     fr: "Français",

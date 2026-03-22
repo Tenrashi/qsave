@@ -5,8 +5,8 @@ import { StatusBar, type StatusBarProps } from "./StatusBar";
 
 const defaultProps: StatusBarProps = {
   games: [],
-  watching: false,
-  onToggleWatching: vi.fn(),
+  // watching: false,
+  // onToggleWatching: vi.fn(),
   autostart: false,
   onToggleAutostart: vi.fn(),
 };
@@ -23,31 +23,32 @@ describe("StatusBar", () => {
     expect(screen.getByText("status.game")).toBeInTheDocument();
   });
 
-  it("shows watching active when watching is true", () => {
-    renderStatusBar({ watching: true });
-    expect(screen.getByText("status.watchingActive")).toBeInTheDocument();
-  });
+  // TODO: autosync is WIP — uncomment when re-enabling
+  // it("shows watching active when watching is true", () => {
+  //   renderStatusBar({ watching: true });
+  //   expect(screen.getByText("status.watchingActive")).toBeInTheDocument();
+  // });
 
-  it("shows watching inactive when watching is false", () => {
-    renderStatusBar({ watching: false });
-    expect(screen.getByText("status.watchingInactive")).toBeInTheDocument();
-  });
+  // it("shows watching inactive when watching is false", () => {
+  //   renderStatusBar({ watching: false });
+  //   expect(screen.getByText("status.watchingInactive")).toBeInTheDocument();
+  // });
 
-  it("calls onToggleWatching when clicking the watch button", async () => {
-    const onToggle = vi.fn();
-    renderStatusBar({ watching: true, onToggleWatching: onToggle });
+  // it("calls onToggleWatching when clicking the watch button", async () => {
+  //   const onToggle = vi.fn();
+  //   renderStatusBar({ watching: true, onToggleWatching: onToggle });
 
-    await user.click(screen.getByText("status.watchingActive"));
-    expect(onToggle).toHaveBeenCalledOnce();
-  });
+  //   await user.click(screen.getByText("status.watchingActive"));
+  //   expect(onToggle).toHaveBeenCalledOnce();
+  // });
 
-  it("toggles icon between eye and eye-off", () => {
-    const { rerender } = renderStatusBar({ watching: true });
-    expect(screen.getByText("status.watchingActive")).toBeInTheDocument();
+  // it("toggles icon between eye and eye-off", () => {
+  //   const { rerender } = renderStatusBar({ watching: true });
+  //   expect(screen.getByText("status.watchingActive")).toBeInTheDocument();
 
-    rerender(<StatusBar {...defaultProps} watching={false} />);
-    expect(screen.getByText("status.watchingInactive")).toBeInTheDocument();
-  });
+  //   rerender(<StatusBar {...defaultProps} watching={false} />);
+  //   expect(screen.getByText("status.watchingInactive")).toBeInTheDocument();
+  // });
 
   it("shows autostart active when autostart is true", () => {
     renderStatusBar({ autostart: true });

@@ -3,7 +3,8 @@ import { useAuthStore } from "@/stores/auth";
 import { useSyncStore } from "@/stores/sync";
 import { useGames } from "@/hooks/queries/useGames/useGames";
 import { useSyncHistory } from "@/hooks/queries/useSyncHistory/useSyncHistory";
-import { useAutoSync } from "@/hooks/useAutoSync/useAutoSync";
+// TODO: autosync is WIP — re-enable once stable
+// import { useAutoSync } from "@/hooks/useAutoSync/useAutoSync";
 import { useGameDetectionNotify } from "@/hooks/useGameDetectionNotify/useGameDetectionNotify";
 import type { Game } from "@/domain/types";
 import {
@@ -27,13 +28,13 @@ import { StatusBar } from "@/components/StatusBar/StatusBar";
 const App = () => {
   const { init, auth } = useAuthStore();
   const {
-    initWatchPreferences,
+    // initWatchPreferences,
     initSyncFingerprints,
     loadBackedUpGames,
     backedUpGames,
     backedUpGamesLoaded,
-    watchedGames,
-    setAllGamesWatched,
+    // watchedGames,
+    // setAllGamesWatched,
   } = useSyncStore();
   const games = useGames();
   const history = useSyncHistory();
@@ -44,7 +45,7 @@ const App = () => {
 
   useEffect(() => {
     init();
-    initWatchPreferences();
+    // initWatchPreferences();
     initSyncFingerprints();
     getHideSteamCloud().then(setHideSteamCloud);
     isAutostartEnabled()
@@ -89,17 +90,18 @@ const App = () => {
     return result;
   }, [allGames, deferredSearch, hideSteamCloud]);
 
-  const watchableGameNames = useMemo(
-    () =>
-      filteredGames
-        .filter((game) => !game.isCloudOnly)
-        .map((game) => game.name),
-    [filteredGames],
-  );
+  // TODO: autosync is WIP — re-enable once stable
+  // const watchableGameNames = useMemo(
+  //   () =>
+  //     filteredGames
+  //       .filter((game) => !game.isCloudOnly)
+  //       .map((game) => game.name),
+  //   [filteredGames],
+  // );
 
-  const watching =
-    watchableGameNames.length > 0 &&
-    watchableGameNames.every((name) => watchedGames[name]);
+  // const watching =
+  //   watchableGameNames.length > 0 &&
+  //   watchableGameNames.every((name) => watchedGames[name]);
 
   const handleToggleAutostart = async () => {
     const next = !autostart;
@@ -112,7 +114,7 @@ const App = () => {
     }
   };
 
-  useAutoSync(games.data, watching);
+  // useAutoSync(games.data);
   useGameDetectionNotify(games.data);
 
   return (
@@ -145,10 +147,10 @@ const App = () => {
       )}
       <StatusBar
         games={games.data ?? []}
-        watching={watching}
-        onToggleWatching={() =>
-          setAllGamesWatched(watchableGameNames, !watching)
-        }
+        // watching={watching}
+        // onToggleWatching={() =>
+        //   setAllGamesWatched(watchableGameNames, !watching)
+        // }
         autostart={autostart}
         onToggleAutostart={handleToggleAutostart}
       />

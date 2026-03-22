@@ -61,7 +61,11 @@
   },
   "notifications": {
     "gameDetectedOne": "{{name}} detected",
-    "gameDetectedOther": "{{count}} new games detected"
+    "gameDetectedOther": "{{count}} new games detected",
+    "syncSuccess": "{{name}} synced",
+    "syncFailed": "{{name}}: sync failed",
+    "restoreSuccess": "{{name}} restored",
+    "restoreFailed": "{{name}}: restore failed"
   },
   "restore": {
     "title": "Restore {{name}}",

@@ -1,20 +1,23 @@
 import { useTranslation } from "react-i18next";
-import { Eye, EyeOff, Gamepad2, Power, PowerOff } from "lucide-react";
+// TODO: autosync is WIP — uncomment when re-enabling
+// import { Eye, EyeOff } from "lucide-react";
+import { Gamepad2, Power, PowerOff } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import type { Game } from "@/domain/types";
 
 export type StatusBarProps = {
   games: Game[];
-  watching: boolean;
-  onToggleWatching: () => void;
+  // TODO: autosync is WIP — uncomment when re-enabling
+  // watching: boolean;
+  // onToggleWatching: () => void;
   autostart: boolean;
   onToggleAutostart: () => void;
 };
 
 export const StatusBar = ({
   games,
-  watching,
-  onToggleWatching,
+  // watching,
+  // onToggleWatching,
   autostart,
   onToggleAutostart,
 }: StatusBarProps) => {
@@ -22,6 +25,7 @@ export const StatusBar = ({
 
   return (
     <div className="flex items-center gap-3 px-4 py-2 border-t text-xs text-muted-foreground">
+      {/* TODO: autosync is WIP — uncomment when re-enabling
       <button
         onClick={onToggleWatching}
         className="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-pointer"
@@ -36,6 +40,7 @@ export const StatusBar = ({
         </span>
       </button>
       <Separator orientation="vertical" className="h-3" />
+      */}
       <button
         onClick={onToggleAutostart}
         className="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-pointer"

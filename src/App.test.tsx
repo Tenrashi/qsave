@@ -194,21 +194,22 @@ describe("App", () => {
     expect(screen.queryByText("history.title")).not.toBeInTheDocument();
   });
 
-  it("shows watching active when all games are watched", async () => {
-    mockScanForGames.mockResolvedValue([sims4Game]);
-    mockGetWatchedGames.mockResolvedValue(["The Sims 4"]);
-    renderWithProviders(<App />);
-    await screen.findByText("The Sims 4");
-    await waitFor(() => {
-      expect(screen.getByText("status.watchingActive")).toBeInTheDocument();
-    });
-  });
+  // TODO: autosync is WIP — uncomment when re-enabling
+  // it("shows watching active when all games are watched", async () => {
+  //   mockScanForGames.mockResolvedValue([sims4Game]);
+  //   mockGetWatchedGames.mockResolvedValue(["The Sims 4"]);
+  //   renderWithProviders(<App />);
+  //   await screen.findByText("The Sims 4");
+  //   await waitFor(() => {
+  //     expect(screen.getByText("status.watchingActive")).toBeInTheDocument();
+  //   });
+  // });
 
-  it("shows watching inactive when no games are watched", async () => {
-    renderWithProviders(<App />);
-    await waitFor(() => expect(mockGetAuthState).toHaveBeenCalled());
-    expect(screen.getByText("status.watchingInactive")).toBeInTheDocument();
-  });
+  // it("shows watching inactive when no games are watched", async () => {
+  //   renderWithProviders(<App />);
+  //   await waitFor(() => expect(mockGetAuthState).toHaveBeenCalled());
+  //   expect(screen.getByText("status.watchingInactive")).toBeInTheDocument();
+  // });
 
   describe("steam cloud filter", () => {
     it("hides steam cloud games when toggle is clicked", async () => {
@@ -242,41 +243,42 @@ describe("App", () => {
     });
   });
 
-  describe("global watch toggle", () => {
-    it("shows watching active when all visible games are watched", async () => {
-      mockScanForGames.mockResolvedValue([sims4Game, steamCloudGame]);
-      mockGetWatchedGames.mockResolvedValue(["The Sims 4", "Portal 2"]);
-      renderWithProviders(<App />);
-      await screen.findByText("The Sims 4");
-      await waitFor(() => {
-        expect(screen.getByText("status.watchingActive")).toBeInTheDocument();
-      });
-    });
+  // TODO: autosync is WIP — uncomment when re-enabling
+  // describe("global watch toggle", () => {
+  //   it("shows watching active when all visible games are watched", async () => {
+  //     mockScanForGames.mockResolvedValue([sims4Game, steamCloudGame]);
+  //     mockGetWatchedGames.mockResolvedValue(["The Sims 4", "Portal 2"]);
+  //     renderWithProviders(<App />);
+  //     await screen.findByText("The Sims 4");
+  //     await waitFor(() => {
+  //       expect(screen.getByText("status.watchingActive")).toBeInTheDocument();
+  //     });
+  //   });
 
-    it("shows watching active when hidden steam cloud games are unwatched but all visible are watched", async () => {
-      mockScanForGames.mockResolvedValue([sims4Game, steamCloudGame]);
-      mockGetWatchedGames.mockResolvedValue(["The Sims 4"]);
-      renderWithProviders(<App />);
-      await screen.findByText("The Sims 4");
+  //   it("shows watching active when hidden steam cloud games are unwatched but all visible are watched", async () => {
+  //     mockScanForGames.mockResolvedValue([sims4Game, steamCloudGame]);
+  //     mockGetWatchedGames.mockResolvedValue(["The Sims 4"]);
+  //     renderWithProviders(<App />);
+  //     await screen.findByText("The Sims 4");
 
-      await user.click(screen.getByTitle("games.hideSteamCloud"));
+  //     await user.click(screen.getByTitle("games.hideSteamCloud"));
 
-      await waitFor(() => {
-        expect(screen.queryByText("Portal 2")).not.toBeInTheDocument();
-      });
-      await waitFor(() => {
-        expect(screen.getByText("status.watchingActive")).toBeInTheDocument();
-      });
-    });
+  //     await waitFor(() => {
+  //       expect(screen.queryByText("Portal 2")).not.toBeInTheDocument();
+  //     });
+  //     await waitFor(() => {
+  //       expect(screen.getByText("status.watchingActive")).toBeInTheDocument();
+  //     });
+  //   });
 
-    it("shows watching inactive when a visible game is unwatched", async () => {
-      mockScanForGames.mockResolvedValue([sims4Game, cyberpunkGame]);
-      mockGetWatchedGames.mockResolvedValue(["The Sims 4"]);
-      renderWithProviders(<App />);
-      await screen.findByText("The Sims 4");
-      expect(screen.getByText("status.watchingInactive")).toBeInTheDocument();
-    });
-  });
+  //   it("shows watching inactive when a visible game is unwatched", async () => {
+  //     mockScanForGames.mockResolvedValue([sims4Game, cyberpunkGame]);
+  //     mockGetWatchedGames.mockResolvedValue(["The Sims 4"]);
+  //     renderWithProviders(<App />);
+  //     await screen.findByText("The Sims 4");
+  //     expect(screen.getByText("status.watchingInactive")).toBeInTheDocument();
+  //   });
+  // });
 
   describe("cloud-only games", () => {
     it("does not show cloud-only games when not authenticated", async () => {

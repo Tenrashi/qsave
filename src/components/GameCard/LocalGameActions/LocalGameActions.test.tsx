@@ -12,20 +12,23 @@ import type { SyncRecord } from "@/domain/types";
 import { sims4Game, manualGame } from "@/test/mocks/games";
 import { LocalGameActions } from "./LocalGameActions";
 
-const { mockSyncGame, mockRemoveManualGame } = vi.hoisted(() => ({
-  mockSyncGame: vi.fn(() =>
-    Promise.resolve({
-      id: "sync-1",
-      gameName: "The Sims 4",
-      fileName: "The Sims 4.zip",
-      syncedAt: new Date(),
-      driveFileId: "file-123",
-      revisionCount: 1,
-      status: RECORD_STATUS.success,
-    } as SyncRecord),
-  ),
-  mockRemoveManualGame: vi.fn(),
-}));
+const { mockSyncGame, mockRemoveManualGame, mockComputeGameHash } = vi.hoisted(
+  () => ({
+    mockSyncGame: vi.fn(() =>
+      Promise.resolve({
+        id: "sync-1",
+        gameName: "The Sims 4",
+        fileName: "The Sims 4.zip",
+        syncedAt: new Date(),
+        driveFileId: "file-123",
+        revisionCount: 1,
+        status: RECORD_STATUS.success,
+      } as SyncRecord),
+    ),
+    mockRemoveManualGame: vi.fn(),
+    mockComputeGameHash: vi.fn(() => "mock-hash"),
+  }),
+);
 
 vi.mock("../utils/formatSize", () => ({
   formatSize: (bytes: number) => `${bytes} bytes`,
@@ -39,6 +42,10 @@ vi.mock("@/lib/store/store", () => ({
   removeManualGame: mockRemoveManualGame,
   setWatchedGames: vi.fn(),
   setSyncFingerprint: vi.fn(),
+}));
+
+vi.mock("@/lib/hash/hash", () => ({
+  computeGameHash: mockComputeGameHash,
 }));
 
 const renderActions = (game = sims4Game) =>
@@ -87,27 +94,28 @@ describe("LocalGameActions", () => {
     expect(screen.getByText("games.sync")).toBeInTheDocument();
   });
 
-  it("shows watch toggle when authenticated", () => {
-    authenticateUser();
-    renderActions();
-    expect(
-      screen.getByRole("button", {
-        name: /games\.watchTooltip|games\.unwatchTooltip/,
-      }),
-    ).toBeInTheDocument();
-  });
+  // TODO: autosync is WIP — uncomment when re-enabling
+  // it("shows watch toggle when authenticated", () => {
+  //   authenticateUser();
+  //   renderActions();
+  //   expect(
+  //     screen.getByRole("button", {
+  //       name: /games\.watchTooltip|games\.unwatchTooltip/,
+  //     }),
+  //   ).toBeInTheDocument();
+  // });
 
-  it("toggles watch state when clicking the eye icon", async () => {
-    authenticateUser();
-    renderActions();
+  // it("toggles watch state when clicking the eye icon", async () => {
+  //   authenticateUser();
+  //   renderActions();
 
-    const toggle = screen.getByRole("button", {
-      name: /games\.watchTooltip|games\.unwatchTooltip/,
-    });
-    await user.click(toggle);
+  //   const toggle = screen.getByRole("button", {
+  //     name: /games\.watchTooltip|games\.unwatchTooltip/,
+  //   });
+  //   await user.click(toggle);
 
-    expect(useSyncStore.getState().watchedGames["The Sims 4"]).toBe(true);
-  });
+  //   expect(useSyncStore.getState().watchedGames["The Sims 4"]).toBe(true);
+  // });
 
   it("shows remove button for manual games", () => {
     renderActions(manualGame);
@@ -198,6 +206,31 @@ describe("LocalGameActions", () => {
         SYNC_STATUS.error,
       );
     });
+  });
+
+  it("disables sync button when saves are unchanged", () => {
+    authenticateUser();
+    useSyncStore.setState({
+      syncFingerprints: {
+        "The Sims 4": { hash: "mock-hash", syncedAt: new Date().toISOString() },
+      },
+    });
+    renderActions();
+    expect(screen.getByText("games.sync").closest("button")).toBeDisabled();
+  });
+
+  it("enables sync button when saves have changed", () => {
+    authenticateUser();
+    useSyncStore.setState({
+      syncFingerprints: {
+        "The Sims 4": {
+          hash: "stale-hash",
+          syncedAt: new Date().toISOString(),
+        },
+      },
+    });
+    renderActions();
+    expect(screen.getByText("games.sync").closest("button")).toBeEnabled();
   });
 
   it("sets error status when sync throws", async () => {

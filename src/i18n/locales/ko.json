@@ -61,7 +61,11 @@
   },
   "notifications": {
     "gameDetectedOne": "{{name}} 감지됨",
-    "gameDetectedOther": "새 게임 {{count}}개 감지됨"
+    "gameDetectedOther": "새 게임 {{count}}개 감지됨",
+    "syncSuccess": "{{name}} 동기화됨",
+    "syncFailed": "{{name}}: 동기화 실패",
+    "restoreSuccess": "{{name}} 복원됨",
+    "restoreFailed": "{{name}}: 복원 실패"
   },
   "restore": {
     "title": "{{name}} 복원",

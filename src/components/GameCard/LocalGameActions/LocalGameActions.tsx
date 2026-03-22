@@ -6,8 +6,9 @@ import {
   ChevronDown,
   Loader2,
   FolderOpen,
-  Eye,
-  EyeOff,
+  // TODO: autosync is WIP — uncomment when re-enabling
+  // Eye,
+  // EyeOff,
   Trash2,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -42,10 +43,11 @@ export const LocalGameActions = ({ game }: LocalGameActionsProps) => {
   const {
     gameStatuses,
     setGameStatus,
+    syncFingerprints,
     updateSyncFingerprint,
     markGameBackedUp,
-    isGameWatched,
-    toggleGameWatch,
+    // isGameWatched,
+    // toggleGameWatch,
     hasBackup,
   } = useSyncStore();
   const locale = dateFnsLocales[i18n.language] ?? enUS;
@@ -53,8 +55,9 @@ export const LocalGameActions = ({ game }: LocalGameActionsProps) => {
   const status = gameStatuses[game.name] ?? SYNC_STATUS.idle;
   const isBusy =
     status === SYNC_STATUS.syncing || status === SYNC_STATUS.restoring;
-  const watched = isGameWatched(game.name);
+  // const watched = isGameWatched(game.name);
   const currentHash = computeGameHash(game.saveFiles);
+  const isSynced = syncFingerprints[game.name]?.hash === currentHash;
 
   const totalSize = game.saveFiles.reduce(
     (sum, file) => sum + file.sizeBytes,
@@ -131,6 +134,7 @@ export const LocalGameActions = ({ game }: LocalGameActionsProps) => {
       )}
       {auth.isAuthenticated && (
         <>
+          {/* TODO: autosync is WIP — uncomment when re-enabling
           <Tooltip>
             <TooltipTrigger
               render={
@@ -157,6 +161,7 @@ export const LocalGameActions = ({ game }: LocalGameActionsProps) => {
               {watched ? t("games.unwatchTooltip") : t("games.watchTooltip")}
             </TooltipContent>
           </Tooltip>
+          */}
           {hasBackup(game.name) && (
             <div className="flex items-center">
               <RestoreDialog
@@ -199,7 +204,7 @@ export const LocalGameActions = ({ game }: LocalGameActionsProps) => {
             size="sm"
             variant="secondary"
             onClick={handleSync}
-            disabled={isBusy}
+            disabled={isBusy || isSynced}
           >
             {status === SYNC_STATUS.syncing ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />

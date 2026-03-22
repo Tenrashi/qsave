@@ -76,8 +76,8 @@ describe("useAutoSync", () => {
     });
   });
 
-  it("stops watching when disabled", () => {
-    renderHook(() => useAutoSync([sims4Game], false), {
+  it("stops watching when no games are watched", () => {
+    renderHook(() => useAutoSync([sims4Game]), {
       wrapper: createWrapper(),
     });
 
@@ -85,8 +85,10 @@ describe("useAutoSync", () => {
     expect(mockCancelAllAutoSyncs).toHaveBeenCalled();
   });
 
-  it("starts watching when enabled with games", () => {
-    renderHook(() => useAutoSync([sims4Game], true), {
+  it("starts watching only directories of watched games", () => {
+    useSyncStore.setState({ watchedGames: { "The Sims 4": true } });
+
+    renderHook(() => useAutoSync([sims4Game, cyberpunkGame]), {
       wrapper: createWrapper(),
     });
 
@@ -97,13 +99,13 @@ describe("useAutoSync", () => {
   });
 
   it("stops watching when no games", () => {
-    renderHook(() => useAutoSync([], true), { wrapper: createWrapper() });
+    renderHook(() => useAutoSync([]), { wrapper: createWrapper() });
 
     expect(mockStopWatching).toHaveBeenCalled();
   });
 
   it("stops watching when games is undefined", () => {
-    renderHook(() => useAutoSync(undefined, true), {
+    renderHook(() => useAutoSync(undefined), {
       wrapper: createWrapper(),
     });
 
@@ -111,10 +113,11 @@ describe("useAutoSync", () => {
   });
 
   it("rescans affected games on file change", async () => {
+    useSyncStore.setState({ watchedGames: { "The Sims 4": true } });
     const updatedGame = { ...sims4Game, saveFiles: [] };
     mockRescanGame.mockResolvedValueOnce(updatedGame);
 
-    renderHook(() => useAutoSync([sims4Game], true), {
+    renderHook(() => useAutoSync([sims4Game]), {
       wrapper: createWrapper(),
     });
 
@@ -126,24 +129,10 @@ describe("useAutoSync", () => {
   });
 
   it("skips auto sync when not authenticated", async () => {
+    useSyncStore.setState({ watchedGames: { "The Sims 4": true } });
     mockRescanGame.mockResolvedValueOnce(sims4Game);
 
-    renderHook(() => useAutoSync([sims4Game], true), {
-      wrapper: createWrapper(),
-    });
-
-    await act(() => {
-      triggerWatcherCallback(["/saves/sims4/save.dat"]);
-    });
-
-    expect(mockScheduleAutoSync).not.toHaveBeenCalled();
-  });
-
-  it("skips auto sync when game is not watched", async () => {
-    useAuthStore.setState({ auth: { isAuthenticated: true } });
-    mockRescanGame.mockResolvedValueOnce(sims4Game);
-
-    renderHook(() => useAutoSync([sims4Game], true), {
+    renderHook(() => useAutoSync([sims4Game]), {
       wrapper: createWrapper(),
     });
 
@@ -162,7 +151,7 @@ describe("useAutoSync", () => {
     });
     mockRescanGame.mockResolvedValueOnce(sims4Game);
 
-    renderHook(() => useAutoSync([sims4Game], true), {
+    renderHook(() => useAutoSync([sims4Game]), {
       wrapper: createWrapper(),
     });
 
@@ -178,7 +167,7 @@ describe("useAutoSync", () => {
     useSyncStore.setState({ watchedGames: { "The Sims 4": true } });
     mockRescanGame.mockResolvedValueOnce(sims4Game);
 
-    renderHook(() => useAutoSync([sims4Game], true), {
+    renderHook(() => useAutoSync([sims4Game]), {
       wrapper: createWrapper(),
     });
 
@@ -203,7 +192,7 @@ describe("useAutoSync", () => {
     mockRescanGame.mockResolvedValueOnce(sims4Game);
     mockComputeGameHash.mockReturnValueOnce("hash-abc");
 
-    renderHook(() => useAutoSync([sims4Game], true), {
+    renderHook(() => useAutoSync([sims4Game]), {
       wrapper: createWrapper(),
     });
 
@@ -227,7 +216,7 @@ describe("useAutoSync", () => {
     } as SyncRecord);
     mockSyncGame.mockReturnValueOnce(syncPromise);
 
-    renderHook(() => useAutoSync([sims4Game], true), {
+    renderHook(() => useAutoSync([sims4Game]), {
       wrapper: createWrapper(),
     });
 
@@ -250,7 +239,7 @@ describe("useAutoSync", () => {
     mockRescanGame.mockResolvedValueOnce(sims4Game);
     mockSyncGame.mockRejectedValueOnce(new Error("upload failed"));
 
-    renderHook(() => useAutoSync([sims4Game], true), {
+    renderHook(() => useAutoSync([sims4Game]), {
       wrapper: createWrapper(),
     });
 
@@ -277,7 +266,7 @@ describe("useAutoSync", () => {
     } as SyncRecord);
     mockSyncGame.mockReturnValueOnce(syncPromise);
 
-    renderHook(() => useAutoSync([sims4Game], true), {
+    renderHook(() => useAutoSync([sims4Game]), {
       wrapper: createWrapper(),
     });
 
@@ -296,8 +285,10 @@ describe("useAutoSync", () => {
     );
   });
 
-  it("ignores changed paths that don't match any game", async () => {
-    renderHook(() => useAutoSync([sims4Game], true), {
+  it("ignores changed paths that don't match any watched game", async () => {
+    useSyncStore.setState({ watchedGames: { "The Sims 4": true } });
+
+    renderHook(() => useAutoSync([sims4Game]), {
       wrapper: createWrapper(),
     });
 
@@ -308,8 +299,12 @@ describe("useAutoSync", () => {
     expect(mockRescanGame).not.toHaveBeenCalled();
   });
 
-  it("watches directories for multiple games", () => {
-    renderHook(() => useAutoSync([sims4Game, cyberpunkGame], true), {
+  it("watches directories for multiple watched games", () => {
+    useSyncStore.setState({
+      watchedGames: { "The Sims 4": true, "Cyberpunk 2077": true },
+    });
+
+    renderHook(() => useAutoSync([sims4Game, cyberpunkGame]), {
       wrapper: createWrapper(),
     });
 
@@ -320,7 +315,9 @@ describe("useAutoSync", () => {
   });
 
   it("cleans up on unmount", () => {
-    const { unmount } = renderHook(() => useAutoSync([sims4Game], true), {
+    useSyncStore.setState({ watchedGames: { "The Sims 4": true } });
+
+    const { unmount } = renderHook(() => useAutoSync([sims4Game]), {
       wrapper: createWrapper(),
     });
 
