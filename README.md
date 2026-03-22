@@ -1,18 +1,44 @@
 # QSave
 
-Desktop app that automatically backs up your video game save files to Google Drive.
+Open-source desktop app that backs up your video game save files to Google Drive.
 
-QSave detects installed games using the [Ludusavi](https://github.com/mtkennerly/ludusavi) manifest, watches for save file changes in real time, and syncs them to your Google Drive with built-in versioning.
+QSave detects installed games using the [Ludusavi](https://github.com/mtkennerly/ludusavi) manifest, and syncs your saves to Google Drive with built-in versioning. Restore them on any device — even across operating systems.
 
 ## Features
 
-- **Auto-detection** — Scans your system for installed games and their save files using multiple game manifests
-- **Real-time watching** — Monitors save directories for changes with debounced updates
-- **Google Drive sync** — Upload saves with automatic versioning via Drive revisions
-- **System tray** — Runs in the background, closing the window hides to tray
-- **Notifications** — OS notifications when sync completes
-- **Multi-language** — English, French, Spanish, German, Italian, Portuguese, Russian, Japanese, Chinese, Korean
+### Game Detection
+
+- **19,000+ games** — Scans for save files using multiple community-maintained manifests covering Steam, GOG, Epic, Origin, Uplay, Battle.net, and standalone games
+- **Store integration** — Reads Steam libraries and GOG installations to resolve install-relative save paths
+- **Manual games** — Add any game with custom save paths for full coverage
+- **Steam Cloud indicator** — Shows which games already have Steam Cloud saves, with a toggle to hide them
+
+### Backup & Sync
+
+- **Google Drive sync** — One-click upload of save files with automatic versioning
+- **Up to 5 backups per game** — Keep multiple versions of your saves
+- **Change detection** — Fingerprint-based tracking skips uploads when saves haven't changed
+- **Sync history** — See recent backup and restore operations with timestamps and status
+
+### Restore
+
+- **Quick restore** — One-click restore of the latest backup
+- **Version picker** — Browse and restore from any of your saved versions
+- **Cross-platform restore** — Backups are stored with relative paths, so you can back up on one OS and restore on another. No path translation hacks needed
+- **Cloud-only games** — See and restore games backed up from other devices, even if the game isn't installed locally
+- **Custom restore location** — Pick any folder as the restore target
+- **Backup deletion** — Remove individual backup versions from the cloud
+
+### Desktop Integration
+
+- **System tray** — Runs in the background; closing the window hides to tray
+- **Autostart** — Optional launch at system startup
+- **Native notifications** — OS notifications when sync or restore completes
 - **Dark/Light mode** — Follows your system theme
+
+### Internationalization
+
+English, French, Spanish, German, Italian, Portuguese, Russian, Japanese, Chinese, Korean
 
 ## Tech Stack
 

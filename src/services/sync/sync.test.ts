@@ -48,10 +48,24 @@ describe("syncGame", () => {
     });
   });
 
-  it("sends a notification after sync", async () => {
+  it("sends a translated notification on success", async () => {
     await syncGame(sims4Game);
 
-    expect(mockNotify).toHaveBeenCalledOnce();
+    expect(mockNotify).toHaveBeenCalledWith(
+      "QSave",
+      "notifications.syncSuccess",
+    );
+  });
+
+  it("sends a translated notification on failure", async () => {
+    mockUploadGameArchive.mockRejectedValueOnce(new Error("Network error"));
+
+    await syncGame(sims4Game);
+
+    expect(mockNotify).toHaveBeenCalledWith(
+      "QSave",
+      "notifications.syncFailed",
+    );
   });
 
   it("returns an error record when upload fails", async () => {

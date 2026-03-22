@@ -61,7 +61,11 @@
   },
   "notifications": {
     "gameDetectedOne": "{{name}} détecté",
-    "gameDetectedOther": "{{count}} nouveaux jeux détectés"
+    "gameDetectedOther": "{{count}} nouveaux jeux détectés",
+    "syncSuccess": "{{name}} synchronisé",
+    "syncFailed": "{{name}} : échec de la synchronisation",
+    "restoreSuccess": "{{name}} restauré",
+    "restoreFailed": "{{name}} : échec de la restauration"
   },
   "restore": {
     "title": "Restaurer {{name}}",

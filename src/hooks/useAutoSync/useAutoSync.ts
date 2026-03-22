@@ -11,16 +11,14 @@ import { computeGameHash } from "@/lib/hash/hash";
 import { syncGame } from "@/services/sync/sync";
 import { rescanGame } from "@/services/scanner/scanner";
 
-export const useAutoSync = (
-  games: Game[] | undefined,
-  globalWatchEnabled: boolean,
-): void => {
+export const useAutoSync = (games: Game[] | undefined): void => {
   const queryClient = useQueryClient();
   const gamesRef = useRef<Game[]>([]);
   gamesRef.current = games ?? [];
 
   const {
     isGameWatched,
+    watchedGames,
     gameStatuses,
     setGameStatus,
     syncFingerprints,
@@ -29,25 +27,46 @@ export const useAutoSync = (
   const { auth } = useAuthStore();
 
   // Keep refs to avoid stale closures in the watcher callback
-  const storeRef = useRef({ isGameWatched, gameStatuses, syncFingerprints, setGameStatus, updateSyncFingerprint, auth });
-  storeRef.current = { isGameWatched, gameStatuses, syncFingerprints, setGameStatus, updateSyncFingerprint, auth };
+  const storeRef = useRef({
+    isGameWatched,
+    gameStatuses,
+    syncFingerprints,
+    setGameStatus,
+    updateSyncFingerprint,
+    auth,
+  });
+  storeRef.current = {
+    isGameWatched,
+    gameStatuses,
+    syncFingerprints,
+    setGameStatus,
+    updateSyncFingerprint,
+    auth,
+  };
+
+  // Cancel everything on unmount only (not on dep changes)
+  useEffect(() => () => cancelAllAutoSyncs(), []);
 
   useEffect(() => {
-    if (!globalWatchEnabled || !games?.length) {
+    const watchedList = (games ?? []).filter(
+      (game) => game.savePaths.length > 0 && watchedGames[game.name],
+    );
+
+    if (watchedList.length === 0) {
       stopWatching();
       cancelAllAutoSyncs();
       return;
     }
 
-    // Build dir -> gameName lookup
+    // Build dir -> gameName lookup for watched games only
     const dirToGame = new Map<string, string>();
-    for (const game of games) {
+    for (const game of watchedList) {
       for (const dir of game.savePaths) {
         dirToGame.set(dir, game.name);
       }
     }
 
-    const dirs = games.flatMap((g) => g.savePaths);
+    const dirs = watchedList.flatMap((game) => game.savePaths);
 
     startWatching(dirs, (changedPaths) => {
       // Find which games were affected
@@ -75,11 +94,12 @@ export const useAutoSync = (
 
         const store = storeRef.current;
         if (!store.auth.isAuthenticated) continue;
-        if (!store.isGameWatched(gameName)) continue;
         if (store.gameStatuses[gameName] === SYNC_STATUS.syncing) continue;
 
         scheduleAutoSync(gameName, () => {
-          const currentGame = gamesRef.current.find((game) => game.name === gameName);
+          const currentGame = gamesRef.current.find(
+            (game) => game.name === gameName,
+          );
           if (!currentGame) return;
 
           const currentStore = storeRef.current;
@@ -90,12 +110,17 @@ export const useAutoSync = (
           currentStore.setGameStatus(gameName, SYNC_STATUS.syncing);
           syncGame(currentGame)
             .then((record) => {
-              const status = record.status === SYNC_STATUS.error ? SYNC_STATUS.error : SYNC_STATUS.success;
+              const status =
+                record.status === SYNC_STATUS.error
+                  ? SYNC_STATUS.error
+                  : SYNC_STATUS.success;
               currentStore.setGameStatus(gameName, status);
               if (status === SYNC_STATUS.success) {
                 currentStore.updateSyncFingerprint(gameName, hash);
               }
-              queryClient.invalidateQueries({ queryKey: QUERY_KEYS.syncHistory });
+              queryClient.invalidateQueries({
+                queryKey: QUERY_KEYS.syncHistory,
+              });
             })
             .catch(() => {
               currentStore.setGameStatus(gameName, SYNC_STATUS.error);
@@ -106,7 +131,6 @@ export const useAutoSync = (
 
     return () => {
       stopWatching();
-      cancelAllAutoSyncs();
     };
-  }, [globalWatchEnabled, games]);
+  }, [watchedGames, games]);
 };

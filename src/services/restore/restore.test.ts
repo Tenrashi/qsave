@@ -65,6 +65,26 @@ describe("restoreGame", () => {
     });
   });
 
+  it("sends a translated notification on success", async () => {
+    await restoreGame(sims4Game, "backup-123");
+
+    expect(mockNotify).toHaveBeenCalledWith(
+      "QSave",
+      "notifications.restoreSuccess",
+    );
+  });
+
+  it("sends a translated notification on failure", async () => {
+    mockDownloadBackup.mockRejectedValueOnce(new Error("Download failed"));
+
+    await restoreGame(sims4Game, "backup-123");
+
+    expect(mockNotify).toHaveBeenCalledWith(
+      "QSave",
+      "notifications.restoreFailed",
+    );
+  });
+
   it("returns an error record when download fails", async () => {
     mockDownloadBackup.mockRejectedValueOnce(new Error("Download failed"));
 

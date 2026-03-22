@@ -61,7 +61,11 @@
   },
   "notifications": {
     "gameDetectedOne": "检测到 {{name}}",
-    "gameDetectedOther": "检测到 {{count}} 个新游戏"
+    "gameDetectedOther": "检测到 {{count}} 个新游戏",
+    "syncSuccess": "{{name}} 已同步",
+    "syncFailed": "{{name}}：同步失败",
+    "restoreSuccess": "{{name}} 已恢复",
+    "restoreFailed": "{{name}}：恢复失败"
   },
   "restore": {
     "title": "恢复 {{name}}",

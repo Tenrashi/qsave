@@ -5,6 +5,7 @@ import { APP_NAME, TAURI_COMMANDS } from "@/lib/constants/constants";
 import { downloadBackup } from "@/services/drive/drive";
 import { addSyncRecord } from "@/lib/store/store";
 import { notify } from "@/lib/notify/notify";
+import i18n from "@/i18n";
 import type { ZipMeta, ExtractResult } from "./restore.types";
 
 export const restoreGame = async (
@@ -49,7 +50,7 @@ export const restoreGame = async (
     await addSyncRecord(record);
     await notify(
       APP_NAME,
-      `${game.name}: ${result.file_count} file(s) restored`,
+      i18n.t("notifications.restoreSuccess", { name: game.name }),
     );
     return record;
   } catch (err) {
@@ -66,7 +67,10 @@ export const restoreGame = async (
     };
 
     await addSyncRecord(record);
-    await notify(APP_NAME, `${game.name}: restore failed`);
+    await notify(
+      APP_NAME,
+      i18n.t("notifications.restoreFailed", { name: game.name }),
+    );
     return record;
   }
 };

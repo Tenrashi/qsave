@@ -61,7 +61,11 @@
   },
   "notifications": {
     "gameDetectedOne": "{{name}} erkannt",
-    "gameDetectedOther": "{{count}} neue Spiele erkannt"
+    "gameDetectedOther": "{{count}} neue Spiele erkannt",
+    "syncSuccess": "{{name}} synchronisiert",
+    "syncFailed": "{{name}}: Synchronisierung fehlgeschlagen",
+    "restoreSuccess": "{{name}} wiederhergestellt",
+    "restoreFailed": "{{name}}: Wiederherstellung fehlgeschlagen"
   },
   "restore": {
     "title": "{{name}} wiederherstellen",

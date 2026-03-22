@@ -62,7 +62,11 @@
   },
   "notifications": {
     "gameDetectedOne": "{{name}} обнаружена",
-    "gameDetectedOther": "Обнаружено {{count}} новых игр"
+    "gameDetectedOther": "Обнаружено {{count}} новых игр",
+    "syncSuccess": "{{name}} синхронизировано",
+    "syncFailed": "{{name}}: ошибка синхронизации",
+    "restoreSuccess": "{{name}} восстановлено",
+    "restoreFailed": "{{name}}: ошибка восстановления"
   },
   "restore": {
     "title": "Восстановить {{name}}",
