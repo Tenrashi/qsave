@@ -63,12 +63,14 @@ export const useSyncStore = create<SyncStore>((set, get) => ({
   isGameWatched: (gameName) => get().watchedGames[gameName] ?? false,
 
   setAllGamesWatched: async (gameNames, watched) => {
-    const updated: Record<string, boolean> = {};
+    const updated: Record<string, boolean> = { ...get().watchedGames };
     for (const name of gameNames) {
       updated[name] = watched;
     }
     set({ watchedGames: updated });
-    const names = watched ? gameNames : [];
+    const names = Object.entries(updated)
+      .filter(([, value]) => value)
+      .map(([name]) => name);
     await setWatchedGames(names);
   },
 

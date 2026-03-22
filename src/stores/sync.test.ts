@@ -124,6 +124,20 @@ describe("useSyncStore", () => {
       });
       expect(mockSetWatchedGames).toHaveBeenCalledWith([]);
     });
+
+    it("preserves watch state of games not in the batch", async () => {
+      useSyncStore.setState({
+        watchedGames: { "Sims 4": true },
+      });
+
+      await useSyncStore.getState().setAllGamesWatched(["Elden Ring"], false);
+
+      expect(useSyncStore.getState().watchedGames).toEqual({
+        "Sims 4": true,
+        "Elden Ring": false,
+      });
+      expect(mockSetWatchedGames).toHaveBeenCalledWith(["Sims 4"]);
+    });
   });
 
   describe("sync fingerprints", () => {
