@@ -7,7 +7,7 @@ import { DialogClose } from "@/components/ui/dialog";
 import type { Game, DriveBackup } from "@/domain/types";
 import { TAURI_COMMANDS } from "@/lib/constants/constants";
 import { getDeviceId } from "@/lib/store/store";
-import { getDeviceGamePaths } from "@/services/drive/drive";
+import { findDeviceGamePaths } from "@/operations/devices/devices";
 import { useGameBackups } from "@/hooks/queries/useGameBackups/useGameBackups";
 import { useRestoreBackup } from "@/hooks/mutations/useRestoreBackup/useRestoreBackup";
 import { useDeleteBackup } from "@/hooks/mutations/useDeleteBackup/useDeleteBackup";
@@ -47,7 +47,7 @@ export const RestoreBody = ({ game, quick, open }: RestoreBodyProps) => {
 
     const loadDevicePath = async () => {
       const deviceId = await getDeviceId();
-      const paths = await getDeviceGamePaths(deviceId, game.name);
+      const paths = await findDeviceGamePaths(deviceId, game.name);
       if (paths?.[0]) setTargetPath(paths[0]);
     };
 

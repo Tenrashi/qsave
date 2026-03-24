@@ -22,7 +22,7 @@ import {
 import { SYNC_STATUS } from "@/domain/types";
 import type { Game } from "@/domain/types";
 import { QUERY_KEYS } from "@/lib/constants/constants";
-import { syncGame } from "@/services/sync/sync";
+import { syncGame } from "@/operations/sync/sync/sync";
 import { computeGameHash } from "@/lib/hash/hash";
 import { removeManualGame } from "@/lib/store/store";
 import { useAuthStore } from "@/stores/auth";

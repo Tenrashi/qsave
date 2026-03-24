@@ -47,12 +47,15 @@ const {
   mockGetDeviceId: vi.fn(() => Promise.resolve("test-device-id")),
 }));
 
-vi.mock("@/services/drive/drive", () => ({
+vi.mock("@/operations/drive/backups/backups", () => ({
   listGameBackups: mockListGameBackups,
-  updateDevicePaths: mockUpdateDevicePaths,
 }));
 
-vi.mock("@/services/restore/restore", () => ({
+vi.mock("@/operations/devices/devices", () => ({
+  saveDevicePaths: mockUpdateDevicePaths,
+}));
+
+vi.mock("@/operations/restore/restore/restore", () => ({
   restoreGame: mockRestoreGame,
 }));
 
@@ -62,7 +65,7 @@ vi.mock("@/lib/store/store", () => ({
   setSyncFingerprint: vi.fn(),
 }));
 
-vi.mock("@/services/scanner/scanner", () => ({
+vi.mock("@/operations/scanner/scanner/scanner", () => ({
   scanManualGame: mockScanManualGame,
 }));
 

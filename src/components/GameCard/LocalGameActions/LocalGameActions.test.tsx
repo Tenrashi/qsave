@@ -34,7 +34,7 @@ vi.mock("../utils/formatSize", () => ({
   formatSize: (bytes: number) => `${bytes} bytes`,
 }));
 
-vi.mock("@/services/sync/sync", () => ({
+vi.mock("@/operations/sync/sync/sync", () => ({
   syncGame: mockSyncGame,
 }));
 

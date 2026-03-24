@@ -5,7 +5,7 @@ import { syncGame, syncAllGames } from "./sync";
 
 const {
   mockUploadGameArchive,
-  mockUpdateDevicePaths,
+  mockSaveDevicePaths,
   mockAddSyncRecord,
   mockGetDeviceId,
   mockNotify,
@@ -13,15 +13,18 @@ const {
   mockUploadGameArchive: vi.fn(() =>
     Promise.resolve({ fileId: "drive-file-123" }),
   ),
-  mockUpdateDevicePaths: vi.fn(() => Promise.resolve()),
+  mockSaveDevicePaths: vi.fn(() => Promise.resolve()),
   mockAddSyncRecord: vi.fn(),
   mockGetDeviceId: vi.fn(() => Promise.resolve("test-device-id")),
   mockNotify: vi.fn(),
 }));
 
-vi.mock("@/services/drive/drive", () => ({
+vi.mock("@/operations/drive/backups/backups", () => ({
   uploadGameArchive: mockUploadGameArchive,
-  updateDevicePaths: mockUpdateDevicePaths,
+}));
+
+vi.mock("@/operations/devices/devices", () => ({
+  saveDevicePaths: mockSaveDevicePaths,
 }));
 
 vi.mock("@/lib/store/store", () => ({
@@ -99,7 +102,7 @@ describe("syncGame", () => {
 
     await vi.waitFor(() => {
       expect(mockGetDeviceId).toHaveBeenCalledOnce();
-      expect(mockUpdateDevicePaths).toHaveBeenCalledWith(
+      expect(mockSaveDevicePaths).toHaveBeenCalledWith(
         "test-device-id",
         manualGame.name,
         manualGame.savePaths,
@@ -110,15 +113,18 @@ describe("syncGame", () => {
   it("does not update device paths for auto-detected games", async () => {
     await syncGame(sims4Game);
 
-    expect(mockUpdateDevicePaths).not.toHaveBeenCalled();
+    expect(mockSaveDevicePaths).not.toHaveBeenCalled();
   });
 
   it("does not block sync when device paths update fails", async () => {
-    mockUpdateDevicePaths.mockRejectedValueOnce(new Error("Drive error"));
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    mockSaveDevicePaths.mockRejectedValueOnce(new Error("Drive error"));
 
     const record = await syncGame(manualGame);
+    await vi.waitFor(() => expect(warnSpy).toHaveBeenCalled());
 
     expect(record.status).toBe(RECORD_STATUS.success);
+    warnSpy.mockRestore();
   });
 });
 

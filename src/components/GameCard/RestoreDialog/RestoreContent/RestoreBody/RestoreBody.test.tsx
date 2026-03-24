@@ -47,17 +47,24 @@ vi.mock("@tauri-apps/api/core", () => ({
 }));
 
 vi.mock("@/services/drive/drive", () => ({
-  listGameBackups: mockListGameBackups,
-  getDeviceGamePaths: mockGetDeviceGamePaths,
   deleteGameBackup: mockDeleteGameBackup,
 }));
 
-vi.mock("@/services/restore/restore", () => ({
+vi.mock("@/operations/drive/backups/backups", () => ({
+  listGameBackups: mockListGameBackups,
+}));
+
+vi.mock("@/operations/devices/devices", () => ({
+  findDeviceGamePaths: mockGetDeviceGamePaths,
+}));
+
+vi.mock("@/operations/restore/restore/restore", () => ({
   restoreGame: mockRestoreGame,
 }));
 
 vi.mock("@/lib/store/store", () => ({
   getDeviceId: mockGetDeviceId,
+  setSyncFingerprint: vi.fn(),
 }));
 
 vi.mock("@/components/ui/status-message", () => ({
