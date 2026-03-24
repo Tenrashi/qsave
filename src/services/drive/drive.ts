@@ -163,17 +163,6 @@ export const deleteFile = async (fileId: string): Promise<void> => {
   await assertOk(res, "Failed to delete file");
 };
 
-export const deleteGameBackup = async (fileId: string): Promise<void> => {
-  try {
-    await deleteFile(fileId);
-  } catch (error) {
-    throw new Error(
-      `Failed to delete backup "${fileId}": ${error instanceof Error ? error.message : error}`,
-      { cause: error },
-    );
-  }
-};
-
 export const getBackupFile = async (fileId: string): Promise<Uint8Array> => {
   try {
     const headers = await authHeaders();

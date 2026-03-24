@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   listBackedUpGameNames,
   listGameBackups,
+  deleteGameBackup,
   uploadGameArchive,
 } from "./backups";
 
@@ -84,6 +85,24 @@ describe("backups", () => {
 
       await expect(listGameBackups("Sims 4")).rejects.toThrow(
         'Failed to list backups for "Sims 4"',
+      );
+    });
+  });
+
+  describe("deleteGameBackup", () => {
+    it("deletes file by ID", async () => {
+      mockDeleteFile.mockResolvedValueOnce(undefined);
+
+      await deleteGameBackup("file-123");
+
+      expect(mockDeleteFile).toHaveBeenCalledWith("file-123");
+    });
+
+    it("wraps errors with fileId context", async () => {
+      mockDeleteFile.mockRejectedValueOnce(new Error("delete failed"));
+
+      await expect(deleteGameBackup("file-123")).rejects.toThrow(
+        'Failed to delete backup "file-123"',
       );
     });
   });

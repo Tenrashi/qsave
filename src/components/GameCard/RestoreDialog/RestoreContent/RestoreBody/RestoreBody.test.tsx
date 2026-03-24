@@ -46,12 +46,9 @@ vi.mock("@tauri-apps/api/core", () => ({
   invoke: mockInvoke,
 }));
 
-vi.mock("@/services/drive/drive", () => ({
-  deleteGameBackup: mockDeleteGameBackup,
-}));
-
 vi.mock("@/operations/drive/backups/backups", () => ({
   listGameBackups: mockListGameBackups,
+  deleteGameBackup: mockDeleteGameBackup,
 }));
 
 vi.mock("@/operations/devices/devices", () => ({

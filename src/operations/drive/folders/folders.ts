@@ -61,7 +61,10 @@ export const ensureDevicesFolder = async (): Promise<string> => {
     const rootId = await ensureQSaveFolder();
 
     const cached = await getDriveFolderId(DEVICES_FOLDER_NAME);
-    if (cached) return cached;
+    if (cached) {
+      const found = await getFolder(DEVICES_FOLDER_NAME, rootId);
+      if (found === cached) return cached;
+    }
 
     const existing = await getFolder(DEVICES_FOLDER_NAME, rootId);
     if (existing) {

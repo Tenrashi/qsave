@@ -5,7 +5,6 @@ import {
   getFile,
   getFilesInFolder,
   deleteFile,
-  deleteGameBackup,
   getBackupFile,
   postFile,
   getFolderNames,
@@ -153,30 +152,6 @@ describe("drive service", () => {
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("/files/file-123"),
         expect.objectContaining({ method: "DELETE" }),
-      );
-    });
-  });
-
-  describe("deleteGameBackup", () => {
-    it("deletes file by ID", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        text: () => Promise.resolve(""),
-      });
-
-      await deleteGameBackup("file-123");
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/files/file-123"),
-        expect.objectContaining({ method: "DELETE" }),
-      );
-    });
-
-    it("wraps errors with fileId context", async () => {
-      mockFetch.mockResolvedValueOnce(errorResponse(404));
-
-      await expect(deleteGameBackup("file-123")).rejects.toThrow(
-        'Failed to delete backup "file-123"',
       );
     });
   });

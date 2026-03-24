@@ -157,13 +157,13 @@ describe("folders", () => {
       mockGetFolder.mockResolvedValueOnce("root-id");
     });
 
-    it("returns cached devices folder ID", async () => {
+    it("returns cached devices folder ID when it matches Drive", async () => {
       mockGetDriveFolderId.mockResolvedValueOnce("devices-folder");
+      mockGetFolder.mockResolvedValueOnce("devices-folder");
 
       const result = await ensureDevicesFolder();
 
       expect(result).toBe("devices-folder");
-      expect(mockGetFolder).toHaveBeenCalledTimes(1);
     });
 
     it("finds existing devices folder", async () => {
