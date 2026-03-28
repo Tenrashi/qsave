@@ -78,7 +78,7 @@ fn resolve_files(save_paths: &[String], files: &[String]) -> Result<Vec<Resolved
             .map_err(|e| format!("Failed to read {file_path}: {e}"))?;
 
         resolved.push(ResolvedFile {
-            relative_path: relative.to_string(),
+            relative_path: relative,
             contents,
             entry_name,
         });

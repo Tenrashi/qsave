@@ -10,7 +10,6 @@ const {
   mockAddSyncRecord,
   mockGetDeviceId,
   mockNotify,
-  mockMarkGameBackedUp,
 } = vi.hoisted(() => ({
   mockUploadGameArchive: vi.fn(() =>
     Promise.resolve({ fileId: "drive-file-123", contentHash: "hash-abc" }),
@@ -20,7 +19,6 @@ const {
   mockAddSyncRecord: vi.fn(),
   mockGetDeviceId: vi.fn(() => Promise.resolve("test-device-id")),
   mockNotify: vi.fn(),
-  mockMarkGameBackedUp: vi.fn(),
 }));
 
 vi.mock("@/operations/drive/backups/backups", () => ({
@@ -42,14 +40,6 @@ vi.mock("@/lib/store/store", () => ({
 
 vi.mock("@/lib/notify/notify", () => ({
   notify: mockNotify,
-}));
-
-vi.mock("@/stores/sync", () => ({
-  useSyncStore: {
-    getState: () => ({
-      markGameBackedUp: mockMarkGameBackedUp,
-    }),
-  },
 }));
 
 describe("syncGame", () => {
@@ -140,12 +130,6 @@ describe("syncGame", () => {
     expect(record.status).toBe(RECORD_STATUS.success);
     expect(warnSpy).toHaveBeenCalled();
     warnSpy.mockRestore();
-  });
-
-  it("marks game as backed up after successful sync", async () => {
-    await syncGame(sims4Game);
-
-    expect(mockMarkGameBackedUp).toHaveBeenCalledWith("The Sims 4");
   });
 });
 

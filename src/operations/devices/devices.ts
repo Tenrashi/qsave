@@ -70,9 +70,6 @@ export const saveDeviceSync = (
   return saveDeviceSyncLock;
 };
 
-/** @deprecated Use saveDeviceSync instead */
-export const saveDevicePaths = saveDeviceSync;
-
 const saveDeviceSyncUnsafe = async (
   deviceId: string,
   gameName: string,
@@ -118,7 +115,11 @@ export const getCloudGameHash = async (
       if (!raw) continue;
       const gameInfo = normalizeGameInfo(raw);
       if (!gameInfo.lastHash || !gameInfo.lastSyncedAt) continue;
-      if (!latest || gameInfo.lastSyncedAt > latest.syncedAt) {
+      if (
+        !latest ||
+        new Date(gameInfo.lastSyncedAt).getTime() >
+          new Date(latest.syncedAt).getTime()
+      ) {
         latest = {
           hash: gameInfo.lastHash,
           syncedAt: gameInfo.lastSyncedAt,

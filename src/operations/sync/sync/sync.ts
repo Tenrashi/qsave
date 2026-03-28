@@ -5,7 +5,6 @@ import { uploadGameArchive } from "@/operations/drive/backups/backups";
 import { saveDeviceSync } from "@/operations/devices/devices";
 import { rescanGame } from "@/operations/scanner/scanner/scanner";
 import { addSyncRecord, getDeviceId } from "@/lib/store/store";
-import { useSyncStore } from "@/stores/sync";
 import { notify } from "@/lib/notify/notify";
 import i18n from "@/i18n";
 
@@ -30,8 +29,6 @@ export const syncGame = async (game: Game): Promise<SyncResult> => {
     } catch (error) {
       console.warn("Failed to update device sync info:", error);
     }
-
-    useSyncStore.getState().markGameBackedUp(game.name);
 
     const record: SyncResult = {
       id,

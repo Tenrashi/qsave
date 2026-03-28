@@ -84,6 +84,16 @@ describe("useSyncAndUpdate", () => {
     );
   });
 
+  it("marks game as backed up on success", async () => {
+    const { result } = renderHook(() => useSyncAndUpdate(), {
+      wrapper: createWrapper(),
+    });
+
+    await result.current(sims4Game);
+
+    expect(useSyncStore.getState().backedUpGames.has("The Sims 4")).toBe(true);
+  });
+
   it("updates sync fingerprint on success with contentHash", async () => {
     const { result } = renderHook(() => useSyncAndUpdate(), {
       wrapper: createWrapper(),

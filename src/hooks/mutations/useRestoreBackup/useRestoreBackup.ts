@@ -51,7 +51,12 @@ export const useRestoreBackup = (game: Game) => {
 
         await addManualGame(game.name, params.targetPaths);
         const deviceId = await getDeviceId();
-        await saveDeviceSync(deviceId, game.name, params.targetPaths);
+        await saveDeviceSync(
+          deviceId,
+          game.name,
+          params.targetPaths,
+          cloudHash?.hash,
+        );
         const scanned = await scanManualGame(game.name, params.targetPaths);
         await queryClient.cancelQueries({ queryKey: QUERY_KEYS.games });
         queryClient.setQueryData<Game[]>(QUERY_KEYS.games, (prev = []) =>

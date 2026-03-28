@@ -9,7 +9,8 @@ export const useSyncAndUpdate = (): ((game: Game) => Promise<SyncResult>) => {
   const queryClient = useQueryClient();
 
   return async (game: Game) => {
-    const { setGameStatus, updateSyncFingerprint } = useSyncStore.getState();
+    const { setGameStatus, updateSyncFingerprint, markGameBackedUp } =
+      useSyncStore.getState();
     setGameStatus(game.name, SYNC_STATUS.syncing);
     try {
       const result = await syncGame(game);
@@ -18,8 +19,11 @@ export const useSyncAndUpdate = (): ((game: Game) => Promise<SyncResult>) => {
           ? SYNC_STATUS.error
           : SYNC_STATUS.success;
       setGameStatus(game.name, status);
-      if (status === SYNC_STATUS.success && result.contentHash) {
-        await updateSyncFingerprint(game.name, result.contentHash);
+      if (status === SYNC_STATUS.success) {
+        markGameBackedUp(game.name);
+        if (result.contentHash) {
+          await updateSyncFingerprint(game.name, result.contentHash);
+        }
       }
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.syncHistory });
       return result;

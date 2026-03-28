@@ -54,10 +54,12 @@ export const LocalGameActions = ({ game }: LocalGameActionsProps) => {
 
   const [showConflict, setShowConflict] = useState(false);
   const [restoreOpen, setRestoreOpen] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
 
   const status = gameStatuses[game.name] ?? SYNC_STATUS.idle;
-  const isBusy =
+  const isSyncing =
     status === SYNC_STATUS.syncing || status === SYNC_STATUS.restoring;
+  const isBusy = isChecking || isSyncing;
   // const watched = isGameWatched(game.name);
 
   const totalSize = game.saveFiles.reduce(
@@ -92,6 +94,7 @@ export const LocalGameActions = ({ game }: LocalGameActionsProps) => {
   const handleSync = async () => {
     const fingerprint = syncFingerprints[game.name];
     if (fingerprint) {
+      setIsChecking(true);
       try {
         const cloudHash = await getCloudGameHash(game.name);
         if (cloudHash && cloudHash.hash !== fingerprint.hash) {
@@ -100,9 +103,11 @@ export const LocalGameActions = ({ game }: LocalGameActionsProps) => {
         }
       } catch (error) {
         console.warn("Conflict check failed, proceeding with sync:", error);
+      } finally {
+        setIsChecking(false);
       }
     }
-    doSync();
+    await doSync();
   };
 
   return (
