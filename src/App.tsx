@@ -1,6 +1,4 @@
-import { useMemo, useState, useEffect, useDeferredValue, useRef } from "react";
-import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
+import { useMemo, useState, useEffect, useDeferredValue } from "react";
 import { useAuthStore } from "@/stores/auth";
 import { useSyncStore } from "@/stores/sync";
 import { useGames } from "@/hooks/queries/useGames/useGames";
@@ -27,7 +25,6 @@ import { SyncHistory } from "@/components/SyncHistory/SyncHistory";
 import { StatusBar } from "@/components/StatusBar/StatusBar";
 
 const App = () => {
-  const { t } = useTranslation();
   const { init, auth } = useAuthStore();
   const {
     // initWatchPreferences,
@@ -115,13 +112,6 @@ const App = () => {
       setAutostart(!next);
     }
   };
-
-  const prevErrorRef = useRef<Error | null>(null);
-  useEffect(() => {
-    if (!games.error || games.error === prevErrorRef.current) return;
-    prevErrorRef.current = games.error;
-    toast.error(t("toast.scanFailed"), { description: games.error.message });
-  }, [games.error]);
 
   // useAutoSync(games.data);
   useGameDetectionNotify(games.data);

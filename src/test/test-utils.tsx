@@ -1,5 +1,10 @@
 import { render, type RenderOptions } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import { toast } from "sonner";
 import { I18nextProvider } from "react-i18next";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
@@ -15,6 +20,14 @@ i18n.use(initReactI18next).init({
 
 const createTestQueryClient = () => {
   return new QueryClient({
+    queryCache: new QueryCache({
+      onError: (error, query) => {
+        const meta = query.meta as { errorMessage?: string } | undefined;
+        if (meta?.errorMessage) {
+          toast.error(meta.errorMessage, { description: error.message });
+        }
+      },
+    }),
     defaultOptions: {
       queries: { retry: false },
       mutations: { retry: false },
