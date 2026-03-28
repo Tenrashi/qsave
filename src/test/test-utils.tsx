@@ -1,4 +1,9 @@
-import { render, type RenderOptions } from "@testing-library/react";
+import {
+  render,
+  renderHook as baseRenderHook,
+  type RenderOptions,
+  type RenderHookOptions,
+} from "@testing-library/react";
 import {
   QueryCache,
   QueryClient,
@@ -51,7 +56,12 @@ export const renderWithProviders = (
   return render(ui, { wrapper: Providers, ...options });
 };
 
+export const renderHook = <Result, Props>(
+  hook: (props: Props) => Result,
+  options?: RenderHookOptions<Props>,
+) => baseRenderHook(hook, { wrapper: Providers, ...options });
+
 export const setupUser = () => userEvent.setup();
 
-export { screen, within, waitFor, renderHook } from "@testing-library/react";
+export { screen, within, waitFor } from "@testing-library/react";
 export { default as userEvent } from "@testing-library/user-event";
