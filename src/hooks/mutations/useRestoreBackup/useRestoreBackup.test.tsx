@@ -39,6 +39,8 @@ const {
   mockAddManualGame,
   mockScanManualGame,
   mockGetDeviceId,
+  mockToastSuccess,
+  mockToastError,
 } = vi.hoisted(() => ({
   mockListGameBackups: vi.fn(),
   mockSaveDeviceSync: vi.fn(),
@@ -49,6 +51,15 @@ const {
   mockAddManualGame: vi.fn(),
   mockScanManualGame: vi.fn(),
   mockGetDeviceId: vi.fn(() => Promise.resolve("test-device-id")),
+  mockToastSuccess: vi.fn(),
+  mockToastError: vi.fn(),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: mockToastSuccess,
+    error: mockToastError,
+  },
 }));
 
 vi.mock("@/operations/drive/backups/backups", () => ({
@@ -119,18 +130,19 @@ describe("useRestoreBackup", () => {
     });
   });
 
-  it("sets game status to success after restore", async () => {
+  it("sets game status to success and shows success toast after restore", async () => {
     const { result } = renderHook(() => useRestoreBackup(sims4Game), {
       wrapper: createWrapper().wrapper,
     });
 
     result.current.mutate({ backupId: "b1" });
 
-    await waitFor(() => {
+    await waitFor(() =>
       expect(useSyncStore.getState().gameStatuses["The Sims 4"]).toBe(
         SYNC_STATUS.success,
-      );
-    });
+      ),
+    );
+    expect(mockToastSuccess).toHaveBeenCalledWith("toast.restoreSuccess");
   });
 
   it("passes targetPaths to restoreGame", async () => {
@@ -225,7 +237,7 @@ describe("useRestoreBackup", () => {
     expect(mockAddManualGame).not.toHaveBeenCalled();
   });
 
-  it("sets game status to error when restore fails", async () => {
+  it("sets game status to error and shows error toast when restore fails", async () => {
     mockRestoreGame.mockRejectedValueOnce(new Error("Network error"));
 
     const { result } = renderHook(() => useRestoreBackup(sims4Game), {
@@ -234,10 +246,11 @@ describe("useRestoreBackup", () => {
 
     result.current.mutate({ backupId: "b1" });
 
-    await waitFor(() => {
+    await waitFor(() =>
       expect(useSyncStore.getState().gameStatuses["The Sims 4"]).toBe(
         SYNC_STATUS.error,
-      );
-    });
+      ),
+    );
+    expect(mockToastError).toHaveBeenCalledWith("toast.restoreFailed");
   });
 });

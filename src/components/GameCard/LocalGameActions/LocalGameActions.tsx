@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   Upload,
   Download,
@@ -78,8 +79,9 @@ export const LocalGameActions = ({ game }: LocalGameActionsProps) => {
       queryClient.setQueryData<Game[]>(QUERY_KEYS.games, (prev = []) =>
         prev.filter((existing) => existing.name !== game.name),
       );
+      toast.success(t("toast.removeGameSuccess", { name: game.name }));
     } catch {
-      // store write failed — ignore
+      toast.error(t("toast.removeGameFailed"));
     }
   };
 

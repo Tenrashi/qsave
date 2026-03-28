@@ -101,6 +101,19 @@
     "uploadAnyway": "それでもアップロード",
     "downloadCloud": "クラウドからダウンロード"
   },
+  "toast": {
+    "syncSuccess": "{{name}} を同期しました",
+    "syncFailed": "{{name}}: 同期に失敗しました",
+    "restoreSuccess": "{{name}} を復元しました",
+    "restoreFailed": "{{name}}: 復元に失敗しました",
+    "deleteSuccess": "バックアップを削除しました",
+    "deleteFailed": "バックアップの削除に失敗しました",
+    "addGameSuccess": "{{name}} を追加しました",
+    "addGameFailed": "ゲームの追加に失敗しました",
+    "removeGameSuccess": "{{name}} を削除しました",
+    "removeGameFailed": "ゲームの削除に失敗しました",
+    "scanFailed": "ゲームのスキャンに失敗しました"
+  },
   "settings": {
     "language": "言語"
   }

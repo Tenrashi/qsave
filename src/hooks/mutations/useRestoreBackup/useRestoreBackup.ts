@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import type { Game } from "@/domain/types";
 import { SYNC_STATUS, RECORD_STATUS } from "@/domain/types";
 import { QUERY_KEYS } from "@/lib/constants/constants";
@@ -46,6 +47,7 @@ export const useRestoreBackup = (game: Game) => {
 
         if (!game.isCloudOnly || !params?.targetPaths?.length) {
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.games });
+          toast.success(t("toast.restoreSuccess", { name: game.name }));
           return;
         }
 
@@ -65,13 +67,16 @@ export const useRestoreBackup = (game: Game) => {
             scanned,
           ].sort((gameA, gameB) => gameA.name.localeCompare(gameB.name)),
         );
+        toast.success(t("toast.restoreSuccess", { name: game.name }));
       } catch (error) {
         console.error("Post-restore update failed:", error);
         setGameStatus(game.name, SYNC_STATUS.error);
+        toast.error(t("toast.restoreFailed", { name: game.name }));
       }
     },
     onError: () => {
       setGameStatus(game.name, SYNC_STATUS.error);
+      toast.error(t("toast.restoreFailed", { name: game.name }));
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.syncHistory });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.games });
     },

@@ -102,6 +102,19 @@
     "uploadAnyway": "Загрузить всё равно",
     "downloadCloud": "Скачать из облака"
   },
+  "toast": {
+    "syncSuccess": "{{name}} синхронизировано",
+    "syncFailed": "{{name}}: ошибка синхронизации",
+    "restoreSuccess": "{{name}} восстановлено",
+    "restoreFailed": "{{name}}: ошибка восстановления",
+    "deleteSuccess": "Резервная копия удалена",
+    "deleteFailed": "Не удалось удалить резервную копию",
+    "addGameSuccess": "{{name}} добавлено",
+    "addGameFailed": "Не удалось добавить игру",
+    "removeGameSuccess": "{{name}} удалено",
+    "removeGameFailed": "Не удалось удалить игру",
+    "scanFailed": "Не удалось найти игры"
+  },
   "settings": {
     "language": "Язык"
   }

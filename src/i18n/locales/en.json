@@ -101,6 +101,19 @@
     "uploadAnyway": "Upload anyway",
     "downloadCloud": "Download cloud"
   },
+  "toast": {
+    "syncSuccess": "{{name}} synced",
+    "syncFailed": "{{name}}: sync failed",
+    "restoreSuccess": "{{name}} restored",
+    "restoreFailed": "{{name}}: restore failed",
+    "deleteSuccess": "Backup deleted",
+    "deleteFailed": "Failed to delete backup",
+    "addGameSuccess": "{{name}} added",
+    "addGameFailed": "Failed to add game",
+    "removeGameSuccess": "{{name}} removed",
+    "removeGameFailed": "Failed to remove game",
+    "scanFailed": "Failed to scan for games"
+  },
   "settings": {
     "language": "Language"
   }

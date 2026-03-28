@@ -17,6 +17,7 @@ const {
   mockGetSyncHistory,
   mockGetAuthState,
   mockGetWatchedGames,
+  mockToastError,
 } = vi.hoisted(() => ({
   mockScanForGames: vi.fn<() => Promise<Game[]>>(() => Promise.resolve([])),
   mockGetSyncHistory: vi.fn<() => Promise<SyncRecord[]>>(() =>
@@ -28,6 +29,16 @@ const {
   mockGetWatchedGames: vi.fn<() => Promise<string[]>>(() =>
     Promise.resolve([]),
   ),
+  mockToastError: vi.fn(),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: vi.fn(),
+    error: mockToastError,
+    info: vi.fn(),
+    warning: vi.fn(),
+  },
 }));
 
 vi.mock("@/operations/scanner/scanner/scanner", () => ({
@@ -121,10 +132,14 @@ describe("App", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows error banner when games query fails", async () => {
+  it("shows error toast when games query fails", async () => {
     mockScanForGames.mockRejectedValue(new Error("scan failed"));
     renderWithProviders(<App />);
-    expect(await screen.findByText("scan failed")).toBeInTheDocument();
+    await waitFor(() =>
+      expect(mockToastError).toHaveBeenCalledWith("toast.scanFailed", {
+        description: "scan failed",
+      }),
+    );
   });
 
   it("renders local games from scanner", async () => {

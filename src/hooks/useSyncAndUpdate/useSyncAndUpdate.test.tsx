@@ -8,8 +8,17 @@ import { renderHook, waitFor } from "@/test/test-utils";
 import { sims4Game } from "@/test/mocks/games";
 import { useSyncAndUpdate } from "./useSyncAndUpdate";
 
-const { mockSyncGame } = vi.hoisted(() => ({
+const { mockSyncGame, mockToastSuccess, mockToastError } = vi.hoisted(() => ({
   mockSyncGame: vi.fn(),
+  mockToastSuccess: vi.fn(),
+  mockToastError: vi.fn(),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: mockToastSuccess,
+    error: mockToastError,
+  },
 }));
 
 vi.mock("@/operations/sync/sync/sync", () => ({
@@ -72,7 +81,7 @@ describe("useSyncAndUpdate", () => {
     expect(mockSyncGame).toHaveBeenCalledWith(sims4Game);
   });
 
-  it("sets success status after successful sync", async () => {
+  it("sets success status and shows success toast after successful sync", async () => {
     const { result } = renderHook(() => useSyncAndUpdate(), {
       wrapper: createWrapper(),
     });
@@ -82,6 +91,7 @@ describe("useSyncAndUpdate", () => {
     expect(useSyncStore.getState().gameStatuses["The Sims 4"]).toBe(
       SYNC_STATUS.success,
     );
+    expect(mockToastSuccess).toHaveBeenCalledWith("toast.syncSuccess");
   });
 
   it("marks game as backed up on success", async () => {
@@ -125,7 +135,7 @@ describe("useSyncAndUpdate", () => {
     ).toBeUndefined();
   });
 
-  it("sets error status when sync returns error record", async () => {
+  it("sets error status and shows error toast when sync returns error record", async () => {
     mockSyncGame.mockResolvedValueOnce({
       ...successResult,
       status: RECORD_STATUS.error,
@@ -141,9 +151,10 @@ describe("useSyncAndUpdate", () => {
     expect(useSyncStore.getState().gameStatuses["The Sims 4"]).toBe(
       SYNC_STATUS.error,
     );
+    expect(mockToastError).toHaveBeenCalledWith("toast.syncFailed");
   });
 
-  it("sets error status and rethrows when syncGame throws", async () => {
+  it("sets error status, shows error toast, and rethrows when syncGame throws", async () => {
     mockSyncGame.mockRejectedValueOnce(new Error("network error"));
 
     const { result } = renderHook(() => useSyncAndUpdate(), {
@@ -155,6 +166,7 @@ describe("useSyncAndUpdate", () => {
     expect(useSyncStore.getState().gameStatuses["The Sims 4"]).toBe(
       SYNC_STATUS.error,
     );
+    expect(mockToastError).toHaveBeenCalledWith("toast.syncFailed");
   });
 
   it("returns the sync result on success", async () => {

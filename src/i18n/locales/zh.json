@@ -101,6 +101,19 @@
     "uploadAnyway": "仍然上传",
     "downloadCloud": "从云端下载"
   },
+  "toast": {
+    "syncSuccess": "{{name}} 已同步",
+    "syncFailed": "{{name}}：同步失败",
+    "restoreSuccess": "{{name}} 已恢复",
+    "restoreFailed": "{{name}}：恢复失败",
+    "deleteSuccess": "备份已删除",
+    "deleteFailed": "无法删除备份",
+    "addGameSuccess": "{{name}} 已添加",
+    "addGameFailed": "无法添加游戏",
+    "removeGameSuccess": "{{name}} 已移除",
+    "removeGameFailed": "无法移除游戏",
+    "scanFailed": "无法扫描游戏"
+  },
   "settings": {
     "language": "语言"
   }
