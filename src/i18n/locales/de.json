@@ -101,6 +101,19 @@
     "uploadAnyway": "Trotzdem hochladen",
     "downloadCloud": "Cloud herunterladen"
   },
+  "toast": {
+    "syncSuccess": "{{name}} synchronisiert",
+    "syncFailed": "{{name}}: Synchronisierung fehlgeschlagen",
+    "restoreSuccess": "{{name}} wiederhergestellt",
+    "restoreFailed": "{{name}}: Wiederherstellung fehlgeschlagen",
+    "deleteSuccess": "Backup gelöscht",
+    "deleteFailed": "Backup konnte nicht gelöscht werden",
+    "addGameSuccess": "{{name}} hinzugefügt",
+    "addGameFailed": "Spiel konnte nicht hinzugefügt werden",
+    "removeGameSuccess": "{{name}} entfernt",
+    "removeGameFailed": "Spiel konnte nicht entfernt werden",
+    "scanFailed": "Spiele konnten nicht gescannt werden"
+  },
   "settings": {
     "language": "Sprache"
   }

@@ -101,6 +101,19 @@
     "uploadAnyway": "그래도 업로드",
     "downloadCloud": "클라우드에서 다운로드"
   },
+  "toast": {
+    "syncSuccess": "{{name}} 동기화 완료",
+    "syncFailed": "{{name}}: 동기화 실패",
+    "restoreSuccess": "{{name}} 복원 완료",
+    "restoreFailed": "{{name}}: 복원 실패",
+    "deleteSuccess": "백업 삭제됨",
+    "deleteFailed": "백업 삭제 실패",
+    "addGameSuccess": "{{name}} 추가됨",
+    "addGameFailed": "게임 추가 실패",
+    "removeGameSuccess": "{{name}} 제거됨",
+    "removeGameFailed": "게임 제거 실패",
+    "scanFailed": "게임 검색 실패"
+  },
   "settings": {
     "language": "언어"
   }

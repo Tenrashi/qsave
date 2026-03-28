@@ -3,20 +3,33 @@ import { renderWithProviders, screen, setupUser } from "@/test/test-utils";
 import { Dialog } from "@/components/ui/dialog";
 import { AddGameContent, type AddGameContentProps } from "./AddGameContent";
 
-const { mockInvoke, mockAddManualGame, mockScanManualGame } = vi.hoisted(
-  () => ({
-    mockInvoke: vi.fn(),
-    mockAddManualGame: vi.fn(),
-    mockScanManualGame: vi.fn(() =>
-      Promise.resolve({
-        name: "My Game",
-        savePaths: ["/saves/mygame"],
-        saveFiles: [],
-        isManual: true,
-      }),
-    ),
-  }),
-);
+const {
+  mockInvoke,
+  mockAddManualGame,
+  mockScanManualGame,
+  mockToastSuccess,
+  mockToastError,
+} = vi.hoisted(() => ({
+  mockInvoke: vi.fn(),
+  mockAddManualGame: vi.fn(),
+  mockScanManualGame: vi.fn(() =>
+    Promise.resolve({
+      name: "My Game",
+      savePaths: ["/saves/mygame"],
+      saveFiles: [],
+      isManual: true,
+    }),
+  ),
+  mockToastSuccess: vi.fn(),
+  mockToastError: vi.fn(),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: mockToastSuccess,
+    error: mockToastError,
+  },
+}));
 
 vi.mock("@tauri-apps/api/core", () => ({
   invoke: mockInvoke,
@@ -106,7 +119,7 @@ describe("AddGameContent", () => {
     expect(onPathsChange).toHaveBeenCalledWith([]);
   });
 
-  it("submits and calls onClose", async () => {
+  it("submits, shows success toast, and calls onClose", async () => {
     const onClose = vi.fn();
     renderContent({ name: "My Game", paths: ["/saves/mygame"], onClose });
 
@@ -118,7 +131,17 @@ describe("AddGameContent", () => {
     expect(mockAddManualGame).toHaveBeenCalledWith("My Game", [
       "/saves/mygame",
     ]);
+    expect(mockToastSuccess).toHaveBeenCalledWith("toast.addGameSuccess");
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it("shows error toast when submit fails", async () => {
+    mockAddManualGame.mockRejectedValueOnce(new Error("write failed"));
+    renderContent({ name: "My Game", paths: ["/saves/mygame"] });
+
+    await user.click(screen.getByRole("button", { name: "games.add" }));
+
+    expect(mockToastError).toHaveBeenCalledWith("toast.addGameFailed");
   });
 
   it("handles browse cancellation gracefully", async () => {

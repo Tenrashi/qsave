@@ -101,6 +101,19 @@
     "uploadAnyway": "Subir de todos modos",
     "downloadCloud": "Descargar de la nube"
   },
+  "toast": {
+    "syncSuccess": "{{name}} sincronizado",
+    "syncFailed": "{{name}}: sincronización fallida",
+    "restoreSuccess": "{{name}} restaurado",
+    "restoreFailed": "{{name}}: restauración fallida",
+    "deleteSuccess": "Copia eliminada",
+    "deleteFailed": "No se pudo eliminar la copia",
+    "addGameSuccess": "{{name}} añadido",
+    "addGameFailed": "No se pudo añadir el juego",
+    "removeGameSuccess": "{{name}} eliminado",
+    "removeGameFailed": "No se pudo eliminar el juego",
+    "scanFailed": "No se pudieron buscar juegos"
+  },
   "settings": {
     "language": "Idioma"
   }

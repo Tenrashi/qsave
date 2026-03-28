@@ -12,26 +12,39 @@ import type { SyncRecord } from "@/domain/types";
 import { sims4Game, manualGame } from "@/test/mocks/games";
 import { LocalGameActions } from "./LocalGameActions";
 
-const { mockSyncGame, mockRemoveManualGame, mockGetCloudGameHash } = vi.hoisted(
-  () => ({
-    mockSyncGame: vi.fn(() =>
-      Promise.resolve({
-        id: "sync-1",
-        gameName: "The Sims 4",
-        fileName: "The Sims 4.zip",
-        syncedAt: new Date(),
-        driveFileId: "file-123",
-        revisionCount: 1,
-        status: RECORD_STATUS.success,
-        contentHash: "hash-abc",
-      } as SyncRecord),
-    ),
-    mockRemoveManualGame: vi.fn(),
-    mockGetCloudGameHash: vi.fn(() =>
-      Promise.resolve(null as { hash: string; syncedAt: string } | null),
-    ),
-  }),
-);
+const {
+  mockSyncGame,
+  mockRemoveManualGame,
+  mockGetCloudGameHash,
+  mockToastSuccess,
+  mockToastError,
+} = vi.hoisted(() => ({
+  mockSyncGame: vi.fn(() =>
+    Promise.resolve({
+      id: "sync-1",
+      gameName: "The Sims 4",
+      fileName: "The Sims 4.zip",
+      syncedAt: new Date(),
+      driveFileId: "file-123",
+      revisionCount: 1,
+      status: RECORD_STATUS.success,
+      contentHash: "hash-abc",
+    } as SyncRecord),
+  ),
+  mockRemoveManualGame: vi.fn(),
+  mockGetCloudGameHash: vi.fn(() =>
+    Promise.resolve(null as { hash: string; syncedAt: string } | null),
+  ),
+  mockToastSuccess: vi.fn(),
+  mockToastError: vi.fn(),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: mockToastSuccess,
+    error: mockToastError,
+  },
+}));
 
 vi.mock("../utils/formatSize", () => ({
   formatSize: (bytes: number) => `${bytes} bytes`,
@@ -180,21 +193,20 @@ describe("LocalGameActions", () => {
     ).toBeDisabled();
   });
 
-  it("syncs game and updates status on success", async () => {
+  it("syncs game, updates status, and shows success toast", async () => {
     authenticateUser();
     renderActions();
 
     await user.click(screen.getByText("games.sync"));
 
-    await waitFor(() => {
-      expect(mockSyncGame).toHaveBeenCalledWith(sims4Game);
-      expect(useSyncStore.getState().gameStatuses["The Sims 4"]).toBe(
-        SYNC_STATUS.success,
-      );
-    });
+    await waitFor(() => expect(mockSyncGame).toHaveBeenCalledWith(sims4Game));
+    expect(useSyncStore.getState().gameStatuses["The Sims 4"]).toBe(
+      SYNC_STATUS.success,
+    );
+    expect(mockToastSuccess).toHaveBeenCalledWith("toast.syncSuccess");
   });
 
-  it("sets error status when sync returns error record", async () => {
+  it("sets error status and shows error toast when sync returns error record", async () => {
     authenticateUser();
     mockSyncGame.mockResolvedValueOnce({
       status: RECORD_STATUS.error,
@@ -204,25 +216,27 @@ describe("LocalGameActions", () => {
     renderActions();
     await user.click(screen.getByText("games.sync"));
 
-    await waitFor(() => {
+    await waitFor(() =>
       expect(useSyncStore.getState().gameStatuses["The Sims 4"]).toBe(
         SYNC_STATUS.error,
-      );
-    });
+      ),
+    );
+    expect(mockToastError).toHaveBeenCalledWith("toast.syncFailed");
   });
 
-  it("sets error status when sync throws", async () => {
+  it("sets error status and shows error toast when sync throws", async () => {
     authenticateUser();
     mockSyncGame.mockRejectedValueOnce(new Error("network error"));
 
     renderActions();
     await user.click(screen.getByText("games.sync"));
 
-    await waitFor(() => {
+    await waitFor(() =>
       expect(useSyncStore.getState().gameStatuses["The Sims 4"]).toBe(
         SYNC_STATUS.error,
-      );
-    });
+      ),
+    );
+    expect(mockToastError).toHaveBeenCalledWith("toast.syncFailed");
   });
 
   describe("upload-side conflict detection", () => {

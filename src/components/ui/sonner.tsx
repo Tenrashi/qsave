@@ -10,6 +10,7 @@ import {
 const Toaster = ({ ...props }: ToasterProps) => (
   <Sonner
     theme="system"
+    position="top-center"
     className="toaster group"
     icons={{
       success: <CircleCheckIcon className="size-4" />,

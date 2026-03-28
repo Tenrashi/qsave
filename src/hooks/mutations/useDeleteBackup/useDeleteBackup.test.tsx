@@ -4,8 +4,19 @@ import type { ReactNode } from "react";
 import { renderHook, waitFor } from "@/test/test-utils";
 import { useDeleteBackup } from "./useDeleteBackup";
 
-const { mockDeleteGameBackup } = vi.hoisted(() => ({
-  mockDeleteGameBackup: vi.fn(),
+const { mockDeleteGameBackup, mockToastSuccess, mockToastError } = vi.hoisted(
+  () => ({
+    mockDeleteGameBackup: vi.fn(),
+    mockToastSuccess: vi.fn(),
+    mockToastError: vi.fn(),
+  }),
+);
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: mockToastSuccess,
+    error: mockToastError,
+  },
 }));
 
 vi.mock("@/operations/drive/backups/backups", () => ({
@@ -34,7 +45,7 @@ describe("useDeleteBackup", () => {
     expect(mockDeleteGameBackup).toHaveBeenCalledWith("b1");
   });
 
-  it("calls onSuccess callback after deletion", async () => {
+  it("calls onSuccess callback and shows success toast after deletion", async () => {
     mockDeleteGameBackup.mockResolvedValueOnce(undefined);
     const onSuccess = vi.fn();
 
@@ -46,9 +57,10 @@ describe("useDeleteBackup", () => {
     await result.current.mutateAsync("b1");
 
     await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce());
+    expect(mockToastSuccess).toHaveBeenCalledWith("toast.deleteSuccess");
   });
 
-  it("sets error state when deletion fails", async () => {
+  it("sets error state and shows error toast when deletion fails", async () => {
     mockDeleteGameBackup.mockRejectedValueOnce(new Error("Permission denied"));
 
     const { result } = renderHook(() => useDeleteBackup("The Sims 4"), {
@@ -58,5 +70,6 @@ describe("useDeleteBackup", () => {
     result.current.mutate("b1");
 
     await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(mockToastError).toHaveBeenCalledWith("toast.deleteFailed");
   });
 });

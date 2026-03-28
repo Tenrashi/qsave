@@ -1,4 +1,6 @@
-import { useMemo, useState, useEffect, useDeferredValue } from "react";
+import { useMemo, useState, useEffect, useDeferredValue, useRef } from "react";
+import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/stores/auth";
 import { useSyncStore } from "@/stores/sync";
 import { useGames } from "@/hooks/queries/useGames/useGames";
@@ -20,12 +22,12 @@ import {
 import { AppHeader } from "@/components/AppHeader/AppHeader";
 import { AuthStatus } from "@/components/AuthStatus/AuthStatus";
 import { GameToolbar } from "@/components/GameToolbar/GameToolbar";
-import { ErrorBanner } from "@/components/ErrorBanner/ErrorBanner";
 import { GameListPanel } from "@/components/GameListPanel/GameListPanel";
 import { SyncHistory } from "@/components/SyncHistory/SyncHistory";
 import { StatusBar } from "@/components/StatusBar/StatusBar";
 
 const App = () => {
+  const { t } = useTranslation();
   const { init, auth } = useAuthStore();
   const {
     // initWatchPreferences,
@@ -114,6 +116,13 @@ const App = () => {
     }
   };
 
+  const prevErrorRef = useRef<Error | null>(null);
+  useEffect(() => {
+    if (!games.error || games.error === prevErrorRef.current) return;
+    prevErrorRef.current = games.error;
+    toast.error(t("toast.scanFailed"), { description: games.error.message });
+  }, [games.error]);
+
   // useAutoSync(games.data);
   useGameDetectionNotify(games.data);
 
@@ -138,7 +147,6 @@ const App = () => {
           })
         }
       />
-      {games.error && <ErrorBanner message={games.error.message} />}
       <GameListPanel games={filteredGames} isLoading={games.isLoading} />
       {(history.data?.length ?? 0) > 0 && (
         <div className="border-t px-4 py-2">

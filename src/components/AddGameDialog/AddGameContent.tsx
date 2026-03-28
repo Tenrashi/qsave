@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { invoke } from "@tauri-apps/api/core";
 import { Trash2, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,9 +58,10 @@ export const AddGameContent = ({
           gameA.name.localeCompare(gameB.name),
         ),
       );
+      toast.success(t("toast.addGameSuccess", { name: trimmedName }));
       onClose();
     } catch {
-      // store write failed — keep dialog open so user can retry
+      toast.error(t("toast.addGameFailed"));
     }
   };
 
