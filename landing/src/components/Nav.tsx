@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Github } from "lucide-react";
+import { GithubIcon } from "./GithubIcon";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export const Nav = () => {
@@ -17,7 +17,7 @@ export const Nav = () => {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
             aria-label={t("footer.github")}
           >
-            <Github className="size-4" aria-hidden />
+            <GithubIcon className="size-4" />
             <span className="hidden sm:inline">{t("footer.github")}</span>
           </a>
         </div>
