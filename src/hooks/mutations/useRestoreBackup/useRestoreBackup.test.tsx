@@ -17,7 +17,6 @@ i18n.use(initReactI18next).init({
   lng: "cimode",
   resources: {},
   interpolation: { escapeValue: false },
-  showSupportNotice: false,
 });
 
 const defaultRecord: SyncRecord = {
