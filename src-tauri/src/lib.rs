@@ -10,7 +10,7 @@ mod scanner;
 use archive::{CreateZipFileResult, CreateZipResult, ExtractResult, ZipMeta};
 use drive_download::DownloadFileResult;
 use drive_upload::UploadFileResult;
-use scanner::{DetectedGame, scan_manual_game_blocking};
+use scanner::{DetectedGame, resolve_game_paths_blocking, scan_manual_game_blocking};
 use tauri::{
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
@@ -149,6 +149,13 @@ async fn scan_manual_game(name: String, paths: Vec<String>) -> DetectedGame {
 }
 
 #[tauri::command]
+async fn resolve_game_paths(name: String) -> Result<Vec<String>, String> {
+    tokio::task::spawn_blocking(move || resolve_game_paths_blocking(name))
+        .await
+        .map_err(|e| format!("Resolve task failed: {}", e))?
+}
+
+#[tauri::command]
 async fn pick_folder(app: tauri::AppHandle) -> Result<Option<String>, String> {
     use tauri_plugin_dialog::DialogExt;
     let (tx, rx) = tokio::sync::oneshot::channel();
@@ -221,7 +228,7 @@ pub fn run() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_os::init())
-        .invoke_handler(tauri::generate_handler![get_cached_games, scan_games, create_zip, create_zip_file, upload_file, download_drive_file, delete_temp_file, compute_save_hash, extract_zip_file, read_zip_meta_file, start_oauth, send_native_notification, scan_manual_game, pick_folder, keychain_set_tokens, keychain_get_tokens, keychain_delete_tokens])
+        .invoke_handler(tauri::generate_handler![get_cached_games, scan_games, create_zip, create_zip_file, upload_file, download_drive_file, delete_temp_file, compute_save_hash, extract_zip_file, read_zip_meta_file, start_oauth, send_native_notification, scan_manual_game, resolve_game_paths, pick_folder, keychain_set_tokens, keychain_get_tokens, keychain_delete_tokens])
         .setup(|app| {
             let show = MenuItem::with_id(app, "show", "Show QSave", true, None::<&str>)?;
             let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;

@@ -37,6 +37,7 @@ const {
   mockRestoreGame,
   mockAddManualGame,
   mockScanManualGame,
+  mockResolveExpectedPaths,
   mockGetDeviceId,
   mockToastSuccess,
   mockToastError,
@@ -49,6 +50,7 @@ const {
   mockRestoreGame: vi.fn(),
   mockAddManualGame: vi.fn(),
   mockScanManualGame: vi.fn(),
+  mockResolveExpectedPaths: vi.fn(() => Promise.resolve([] as string[])),
   mockGetDeviceId: vi.fn(() => Promise.resolve("test-device-id")),
   mockToastSuccess: vi.fn(),
   mockToastError: vi.fn(),
@@ -82,6 +84,7 @@ vi.mock("@/lib/store/store", () => ({
 
 vi.mock("@/operations/scanner/scanner/scanner", () => ({
   scanManualGame: mockScanManualGame,
+  resolveExpectedPaths: mockResolveExpectedPaths,
 }));
 
 const createWrapper = () => {
@@ -188,6 +191,36 @@ describe("useRestoreBackup", () => {
         "/saves/custom",
       ]);
     });
+  });
+
+  it("does not persist as manual when restored to the manifest path", async () => {
+    mockResolveExpectedPaths.mockResolvedValueOnce(["/saves/manifest"]);
+
+    const { wrapper, queryClient } = createWrapper();
+    const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+
+    const { result } = renderHook(() => useRestoreBackup(cloudOnlyGame), {
+      wrapper,
+    });
+
+    result.current.mutate({
+      backupId: "b1",
+      targetPaths: ["/saves/manifest"],
+    });
+
+    await waitFor(() => {
+      expect(mockToastSuccess).toHaveBeenCalledWith("toast.restoreSuccess");
+    });
+
+    expect(mockAddManualGame).not.toHaveBeenCalled();
+    expect(mockScanManualGame).not.toHaveBeenCalled();
+    expect(mockSaveDeviceSync).toHaveBeenCalledWith(
+      "test-device-id",
+      "Cloud Save RPG",
+      ["/saves/manifest"],
+      "cloud-hash",
+    );
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: QUERY_KEYS.games });
   });
 
   it("replaces cloud-only game in cache without duplicates", async () => {

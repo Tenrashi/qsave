@@ -30,6 +30,7 @@ const {
   mockGetDeviceGamePaths,
   mockGetCloudGameHash,
   mockRescanGame,
+  mockResolveExpectedPaths,
   mockRestoreGame,
   mockDeleteGameBackup,
   mockInvoke,
@@ -45,6 +46,7 @@ const {
     Promise.resolve(null as { hash: string; syncedAt: string } | null),
   ),
   mockRescanGame: vi.fn((game: unknown) => Promise.resolve(game)),
+  mockResolveExpectedPaths: vi.fn(() => Promise.resolve([] as string[])),
   mockRestoreGame: vi.fn(),
   mockDeleteGameBackup: vi.fn(),
   mockInvoke: vi.fn(),
@@ -75,6 +77,7 @@ vi.mock("@/operations/restore/restore/restore", () => ({
 vi.mock("@/operations/scanner/scanner/scanner", () => ({
   rescanGame: mockRescanGame,
   scanManualGame: vi.fn(),
+  resolveExpectedPaths: mockResolveExpectedPaths,
 }));
 
 vi.mock("@/lib/store/store", () => ({
@@ -591,6 +594,40 @@ describe("RestoreBody", () => {
       expect(
         screen.queryByRole("button", { name: "restore.restore" }),
       ).not.toBeInTheDocument();
+    });
+
+    it("pre-fills the manifest path when this device has no entry yet", async () => {
+      mockGetDeviceGamePaths.mockResolvedValueOnce(undefined);
+      mockResolveExpectedPaths.mockResolvedValueOnce(["/Users/test/manifest"]);
+
+      renderBody({ game: cloudOnlyGame });
+
+      await waitFor(() => {
+        expect(screen.getByText("/Users/test/manifest")).toBeInTheDocument();
+      });
+      expect(screen.getByText("restore.changePath")).toBeInTheDocument();
+    });
+
+    it("falls back to the folder picker when the manifest has no path", async () => {
+      mockGetDeviceGamePaths.mockResolvedValueOnce(undefined);
+      mockResolveExpectedPaths.mockResolvedValueOnce([]);
+
+      renderBody({ game: cloudOnlyGame });
+
+      await waitFor(() => {
+        expect(screen.getByText("restore.pickFolder")).toBeInTheDocument();
+      });
+    });
+
+    it("prefers this device's saved path over the manifest path", async () => {
+      mockGetDeviceGamePaths.mockResolvedValueOnce(["/Users/test/device"]);
+
+      renderBody({ game: cloudOnlyGame });
+
+      await waitFor(() => {
+        expect(screen.getByText("/Users/test/device")).toBeInTheDocument();
+      });
+      expect(mockResolveExpectedPaths).not.toHaveBeenCalled();
     });
 
     it("handles device path loading failure gracefully", async () => {

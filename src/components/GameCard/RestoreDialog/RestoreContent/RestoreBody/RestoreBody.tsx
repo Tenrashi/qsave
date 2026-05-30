@@ -12,6 +12,7 @@ import {
   findDeviceGamePaths,
   getCloudGameHash,
 } from "@/operations/devices/devices";
+import { resolveExpectedPaths } from "@/operations/scanner/scanner/scanner";
 import { useSyncStore } from "@/stores/sync";
 import { useSyncAndUpdate } from "@/hooks/useSyncAndUpdate/useSyncAndUpdate";
 import { useGameBackups } from "@/hooks/queries/useGameBackups/useGameBackups";
@@ -64,7 +65,16 @@ export const RestoreBody = ({ game, quick, open }: RestoreBodyProps) => {
       try {
         const deviceId = await getDeviceId();
         const paths = await findDeviceGamePaths(deviceId, game.name);
-        if (paths?.[0]) setTargetPath(paths[0]);
+        if (paths?.[0]) {
+          setTargetPath(paths[0]);
+          return;
+        }
+        // No entry for this device yet (first restore here). For auto-detected
+        // games the manifest still knows the expected path even when no saves
+        // exist locally — pre-fill it. Manual games resolve to [], leaving the
+        // user to pick a folder.
+        const expected = await resolveExpectedPaths(game.name);
+        if (expected[0]) setTargetPath(expected[0]);
       } catch (error) {
         console.warn("Failed to load device path:", error);
       }

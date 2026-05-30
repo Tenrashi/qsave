@@ -4,6 +4,7 @@ import {
   scanManualGame,
   rescanGame,
   loadCachedGames,
+  resolveExpectedPaths,
 } from "./scanner";
 
 import type { ManualGameEntry } from "@/lib/store/store";
@@ -53,6 +54,23 @@ describe("scanManualGame", () => {
     expect(game.name).toBe("Custom Game");
     expect(game.isManual).toBe(true);
     expect(game.saveFiles[0].lastModified).toBeInstanceOf(Date);
+  });
+});
+
+describe("resolveExpectedPaths", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("invokes resolve_game_paths with the game name and returns its paths", async () => {
+    mockInvoke.mockResolvedValueOnce(["/saves/manifest"]);
+
+    const paths = await resolveExpectedPaths("Custom Game");
+
+    expect(mockInvoke).toHaveBeenCalledWith("resolve_game_paths", {
+      name: "Custom Game",
+    });
+    expect(paths).toEqual(["/saves/manifest"]);
   });
 });
 
