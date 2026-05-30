@@ -33,6 +33,9 @@ export const scanManualGame = async (
   return toGame(result, true);
 };
 
+export const resolveExpectedPaths = (gameName: string): Promise<string[]> =>
+  invoke<string[]>(TAURI_COMMANDS.resolveGamePaths, { name: gameName });
+
 export const rescanGame = async (game: Game): Promise<Game> => {
   const result = await invoke<RustDetectedGame>(TAURI_COMMANDS.scanManualGame, {
     name: game.name,

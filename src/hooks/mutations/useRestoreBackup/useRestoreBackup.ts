@@ -9,7 +9,10 @@ import { listGameBackups } from "@/operations/drive/backups/backups";
 import { saveDeviceSync } from "@/operations/devices/devices";
 import { getCloudGameHash } from "@/operations/devices/devices";
 import { restoreGame } from "@/operations/restore/restore/restore";
-import { scanManualGame } from "@/operations/scanner/scanner/scanner";
+import {
+  resolveExpectedPaths,
+  scanManualGame,
+} from "@/operations/scanner/scanner/scanner";
 import { addManualGame, getDeviceId } from "@/lib/store/store";
 import { useSyncStore } from "@/stores/sync";
 
@@ -52,7 +55,6 @@ export const useRestoreBackup = (game: Game) => {
           return;
         }
 
-        await addManualGame(game.name, params.targetPaths);
         const deviceId = await getDeviceId();
         await saveDeviceSync(
           deviceId,
@@ -60,6 +62,22 @@ export const useRestoreBackup = (game: Game) => {
           params.targetPaths,
           cloudHash?.hash,
         );
+
+        // Auto-detected games restored to their canonical manifest location are
+        // picked up by the next scan, so no manual entry is needed. Only restores
+        // to a non-manifest path (true manual games, or a custom folder) must be
+        // tracked explicitly to appear and sync from that location.
+        const expectedPaths = await resolveExpectedPaths(game.name);
+        const isAutoDetected = params.targetPaths.every((path) =>
+          expectedPaths.includes(path),
+        );
+        if (isAutoDetected) {
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.games });
+          toast.success(t("toast.restoreSuccess", { name: game.name }));
+          return;
+        }
+
+        await addManualGame(game.name, params.targetPaths);
         const scanned = await scanManualGame(game.name, params.targetPaths);
         await queryClient.cancelQueries({ queryKey: QUERY_KEYS.games });
         queryClient.setQueryData<Game[]>(QUERY_KEYS.games, (prev = []) =>

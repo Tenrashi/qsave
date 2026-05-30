@@ -32,6 +32,7 @@ export const TAURI_COMMANDS = {
   getCachedGames: "get_cached_games",
   scanGames: "scan_games",
   scanManualGame: "scan_manual_game",
+  resolveGamePaths: "resolve_game_paths",
   pickFolder: "pick_folder",
   keychainSetTokens: "keychain_set_tokens",
   keychainGetTokens: "keychain_get_tokens",
