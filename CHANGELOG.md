@@ -1,3 +1,9 @@
+# [1.8.0](https://github.com/Tenrashi/qsave/compare/v1.7.3...v1.8.0) (2026-05-31)
+
+### Features
+
+- **restore:** pre-fill save folder for cloud-only games on a fresh device ([6258c10](https://github.com/Tenrashi/qsave/commit/6258c10886ac3dcc739a79a664de011c8addbcf4))
+
 ## [1.7.3](https://github.com/Tenrashi/qsave/compare/v1.7.2...v1.7.3) (2026-04-21)
 
 ### Bug Fixes
