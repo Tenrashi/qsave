@@ -25,7 +25,7 @@ const assertOk = async (res: Response, context: string) => {
   throw new Error(`${context}: ${res.status} ${res.statusText} ${body}`);
 };
 
-// eslint-disable-next-line no-control-regex
+// biome-ignore lint/suspicious/noControlCharactersInRegex: stripping control characters is the point
 const CONTROL_CHARS = /[\x00-\x1f\x7f]/g;
 
 const escapeQueryValue = (value: string): string =>
@@ -172,7 +172,7 @@ export const putDeviceFile = async (
       name: fileName,
       parents: [folderId],
     });
-    const boundary = "qsave_device_" + crypto.randomUUID();
+    const boundary = `qsave_device_${crypto.randomUUID()}`;
     const body = buildMultipartBody(
       boundary,
       metadata,

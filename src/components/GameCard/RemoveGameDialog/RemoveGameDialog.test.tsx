@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 vi.mock("./RemoveGameContent/RemoveGameContent", () => ({
   RemoveGameContent: ({ onConfirm }: { onConfirm: () => void }) => (
     <div data-testid="remove-game-content">
-      <button onClick={onConfirm}>Confirm</button>
+      <button type="button" onClick={onConfirm}>
+        Confirm
+      </button>
     </div>
   ),
 }));

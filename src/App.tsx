@@ -44,6 +44,7 @@ const App = () => {
   const [autostart, setAutostart] = useState(false);
   const deferredSearch = useDeferredValue(search);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: run once on mount
   useEffect(() => {
     init();
     // initWatchPreferences();
@@ -54,6 +55,7 @@ const App = () => {
       .catch(() => {});
   }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only reload when auth state changes
   useEffect(() => {
     if (auth.isAuthenticated) {
       loadBackedUpGames();

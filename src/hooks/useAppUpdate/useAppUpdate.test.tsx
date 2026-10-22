@@ -22,7 +22,9 @@ const InstallHarness = () => {
     <div>
       <span>{status}</span>
       {error && <span>{error}</span>}
-      <button onClick={install}>install</button>
+      <button type="button" onClick={install}>
+        install
+      </button>
     </div>
   );
 };

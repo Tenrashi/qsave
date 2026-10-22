@@ -26,9 +26,15 @@ vi.mock("./AddGameContent", () => ({
       <div data-testid="add-game-content">
         <span data-testid="name-value">{name}</span>
         <span data-testid="paths-value">{paths.join(",")}</span>
-        <button onClick={() => onNameChange("Test")}>SetName</button>
-        <button onClick={() => onPathsChange(["/test"])}>SetPaths</button>
-        <button onClick={onClose}>Close</button>
+        <button type="button" onClick={() => onNameChange("Test")}>
+          SetName
+        </button>
+        <button type="button" onClick={() => onPathsChange(["/test"])}>
+          SetPaths
+        </button>
+        <button type="button" onClick={onClose}>
+          Close
+        </button>
       </div>
     );
   },
