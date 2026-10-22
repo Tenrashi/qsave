@@ -74,10 +74,11 @@ export const AddGameContent = ({
 
       <div className="space-y-4">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium">
+          <label htmlFor="add-game-name" className="text-sm font-medium">
             {t("games.gameNameLabel")}
           </label>
           <Input
+            id="add-game-name"
             value={name}
             onChange={(event) => onNameChange(event.target.value)}
             placeholder={t("games.gameNamePlaceholder")}
@@ -86,9 +87,9 @@ export const AddGameContent = ({
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-medium">
+          <span className="text-sm font-medium">
             {t("games.savePathsLabel")}
-          </label>
+          </span>
           {paths.length === 0 ? (
             <p className="text-sm text-muted-foreground py-2">
               {t("games.noPathsAdded")}

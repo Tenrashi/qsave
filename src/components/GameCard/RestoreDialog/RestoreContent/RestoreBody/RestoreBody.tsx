@@ -47,6 +47,7 @@ export const RestoreBody = ({ game, quick, open }: RestoreBodyProps) => {
     setSelected(undefined),
   );
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset only when the dialog closes
   useEffect(() => {
     if (open) return;
     setSelected(undefined);

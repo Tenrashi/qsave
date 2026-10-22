@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 vi.mock("./DeleteBackupContent/DeleteBackupContent", () => ({
   DeleteBackupContent: ({ onConfirm }: { onConfirm: () => void }) => (
     <div data-testid="delete-backup-content">
-      <button onClick={onConfirm}>Confirm</button>
+      <button type="button" onClick={onConfirm}>
+        Confirm
+      </button>
     </div>
   ),
 }));
