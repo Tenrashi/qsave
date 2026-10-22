@@ -14,23 +14,31 @@ export const startWatching = async (
     if (watchers.has(dir)) continue;
 
     try {
-      const unwatch = await watchImmediate(dir, (event) => {
-        const paths = Array.isArray(event.paths) ? event.paths : [event.paths];
-        const changedPaths = paths.filter((path): path is string => typeof path === "string");
-        if (changedPaths.length === 0) return;
+      const unwatch = await watchImmediate(
+        dir,
+        (event) => {
+          const paths = Array.isArray(event.paths)
+            ? event.paths
+            : [event.paths];
+          const changedPaths = paths.filter(
+            (path): path is string => typeof path === "string",
+          );
+          if (changedPaths.length === 0) return;
 
-        // Debounce: games often write temp file + rename
-        const existing = debounceTimers.get(dir);
-        if (existing) clearTimeout(existing);
+          // Debounce: games often write temp file + rename
+          const existing = debounceTimers.get(dir);
+          if (existing) clearTimeout(existing);
 
-        debounceTimers.set(
-          dir,
-          setTimeout(() => {
-            debounceTimers.delete(dir);
-            onChange(changedPaths);
-          }, DEBOUNCE_MS),
-        );
-      }, { recursive: true });
+          debounceTimers.set(
+            dir,
+            setTimeout(() => {
+              debounceTimers.delete(dir);
+              onChange(changedPaths);
+            }, DEBOUNCE_MS),
+          );
+        },
+        { recursive: true },
+      );
 
       watchers.set(dir, unwatch);
     } catch {

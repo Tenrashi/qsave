@@ -31,7 +31,9 @@ const createWrapper = () => {
 
 describe("useSyncHistory", () => {
   it("returns sync history from store", async () => {
-    const { result } = renderHook(() => useSyncHistory(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useSyncHistory(), {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toHaveLength(1);
