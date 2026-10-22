@@ -343,8 +343,8 @@ pub fn extract_zip_file(
 
 /// Processes a single zip entry, writing it to the appropriate target directory.
 /// Returns `true` if a file was written, `false` if the entry was skipped or was a directory.
-fn extract_entry(
-    entry: &mut zip::read::ZipFile,
+fn extract_entry<R: Read>(
+    entry: &mut zip::read::ZipFile<'_, R>,
     canonical_targets: &[PathBuf],
 ) -> Result<bool, String> {
     let name = entry.name().to_string();
