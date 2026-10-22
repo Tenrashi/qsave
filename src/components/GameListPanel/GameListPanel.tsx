@@ -12,14 +12,21 @@ export type GameListPanelProps = {
 
 export const GameListPanel = ({ games, isLoading }: GameListPanelProps) => {
   const { t } = useTranslation();
-  const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null);
-  const scrollRef = useCallback((node: HTMLDivElement | null) => setScrollElement(node), []);
+  const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(
+    null,
+  );
+  const scrollRef = useCallback(
+    (node: HTMLDivElement | null) => setScrollElement(node),
+    [],
+  );
 
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
-        <span className="ml-2 text-sm text-muted-foreground">{t("games.scanning")}</span>
+        <span className="ml-2 text-sm text-muted-foreground">
+          {t("games.scanning")}
+        </span>
       </div>
     );
   }

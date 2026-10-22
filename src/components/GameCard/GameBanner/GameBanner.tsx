@@ -14,7 +14,12 @@ export const GameBanner = memo(({ steamId }: GameBannerProps) => {
   if (!steamId || imgFailed) {
     return (
       <div className="pl-4">
-        <Gamepad2 className="w-4 h-4 text-muted-foreground" role="img" aria-label="gamepad" aria-hidden={false} />
+        <Gamepad2
+          className="w-4 h-4 text-muted-foreground"
+          role="img"
+          aria-label="gamepad"
+          aria-hidden={false}
+        />
       </div>
     );
   }

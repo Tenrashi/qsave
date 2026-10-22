@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { scheduleAutoSync, cancelAutoSync, cancelAllAutoSyncs, hasPendingSync } from "./autoSync";
+import {
+  scheduleAutoSync,
+  cancelAutoSync,
+  cancelAllAutoSyncs,
+  hasPendingSync,
+} from "./autoSync";
 
 beforeEach(() => {
   vi.useFakeTimers();

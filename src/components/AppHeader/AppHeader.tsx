@@ -23,7 +23,9 @@ export const AppHeader = ({ isFetching, onRefresh }: AppHeaderProps) => {
           onClick={onRefresh}
           disabled={isFetching}
         >
-          <RefreshCw className={`w-4 h-4 mr-1.5 ${isFetching ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`w-4 h-4 mr-1.5 ${isFetching ? "animate-spin" : ""}`}
+          />
           {t("app.refresh")}
         </Button>
       </div>
