@@ -65,6 +65,24 @@ English, French, Spanish, German, Italian, Portuguese, Russian, Japanese, Chines
 - [TanStack Query](https://tanstack.com/query) + [Zustand](https://zustand.docs.pmnd.rs/)
 - [Rayon](https://docs.rs/rayon/) — Parallel disk scanning in Rust
 
+## Installation
+
+Download the latest installer for your platform from the [releases page](https://github.com/Tenrashi/qsave/releases/latest).
+
+### macOS
+
+QSave is not yet notarized by Apple (see [qsave.app](https://qsave.app) for more information), so macOS blocks it on first launch:
+
+1. Open QSave, then click **Done** on the warning dialog
+2. Go to **System Settings → Privacy & Security**, scroll down, and click **Open Anyway** next to the QSave message
+3. Confirm with your password
+
+If macOS says the app **is damaged** (versions 1.8.0 and earlier), remove the quarantine flag instead:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/QSave.app
+```
+
 ## Getting Started
 
 ### Prerequisites
