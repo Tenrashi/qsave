@@ -44,6 +44,12 @@ describe("keychain", () => {
         refreshToken: null,
       });
     });
+
+    it("propagates invoke errors", async () => {
+      mockInvoke.mockRejectedValueOnce(new Error("keychain locked"));
+
+      await expect(setTokens("at", "rt")).rejects.toThrow("keychain locked");
+    });
   });
 
   describe("getTokens", () => {
@@ -95,14 +101,6 @@ describe("keychain", () => {
       mockInvoke.mockRejectedValueOnce(new Error("keychain locked"));
 
       await expect(getTokens()).rejects.toThrow("keychain locked");
-    });
-  });
-
-  describe("setTokens", () => {
-    it("propagates invoke errors", async () => {
-      mockInvoke.mockRejectedValueOnce(new Error("keychain locked"));
-
-      await expect(setTokens("at", "rt")).rejects.toThrow("keychain locked");
     });
   });
 

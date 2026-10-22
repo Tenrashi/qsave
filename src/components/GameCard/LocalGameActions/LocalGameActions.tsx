@@ -69,6 +69,7 @@ export const LocalGameActions = ({ game }: LocalGameActionsProps) => {
     0,
   );
   const lastModified = game.saveFiles.reduce(
+    // biome-ignore lint/complexity/useMathMinMax: comparing Dates, Math.max would return a number
     (latest, file) => (file.lastModified > latest ? file.lastModified : latest),
     new Date(0),
   );

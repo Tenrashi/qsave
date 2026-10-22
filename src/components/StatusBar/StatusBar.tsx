@@ -42,6 +42,7 @@ export const StatusBar = ({
       <Separator orientation="vertical" className="h-3" />
       */}
       <button
+        type="button"
         onClick={onToggleAutostart}
         className="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-pointer"
       >

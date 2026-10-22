@@ -37,6 +37,7 @@ export const useAutoSync = (games: Game[] | undefined): void => {
   // Cancel everything on unmount only (not on dep changes)
   useEffect(() => () => cancelAllAutoSyncs(), []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: queryClient is stable
   useEffect(() => {
     const watchedList = (games ?? []).filter(
       (game) => game.savePaths.length > 0 && watchedGames[game.name],
