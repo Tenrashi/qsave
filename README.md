@@ -87,7 +87,7 @@ xattr -dr com.apple.quarantine /Applications/QSave.app
 
 ### Prerequisites
 
-- [Node.js 24](https://nodejs.org/) (LTS)
+- [Node.js 26](https://nodejs.org/)
 - [pnpm 10](https://pnpm.io/)
 - [Rust](https://rustup.rs/) (stable)
 - [Tauri 2 prerequisites](https://tauri.app/start/prerequisites/)
