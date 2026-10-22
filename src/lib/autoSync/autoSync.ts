@@ -1,7 +1,10 @@
 const AUTO_SYNC_DELAY_MS = 30_000;
 const pendingTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
-export const scheduleAutoSync = (gameName: string, onSync: () => void): void => {
+export const scheduleAutoSync = (
+  gameName: string,
+  onSync: () => void,
+): void => {
   cancelAutoSync(gameName);
   const timer = setTimeout(() => {
     pendingTimers.delete(gameName);

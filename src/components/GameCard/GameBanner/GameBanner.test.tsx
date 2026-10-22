@@ -15,14 +15,18 @@ describe("GameBanner", () => {
 
   it("renders gamepad icon when no steamId", () => {
     render(<GameBanner />);
-    expect(screen.queryByRole("img", { name: /steam game banner/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("img", { name: /steam game banner/i }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole("img", { name: /gamepad/i })).toBeInTheDocument();
   });
 
   it("falls back to gamepad icon on image error", () => {
     render(<GameBanner steamId={1222670} />);
     fireEvent.error(screen.getByRole("img", { name: /steam game banner/i }));
-    expect(screen.queryByRole("img", { name: /steam game banner/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("img", { name: /steam game banner/i }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole("img", { name: /gamepad/i })).toBeInTheDocument();
   });
 });

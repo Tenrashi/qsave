@@ -19,15 +19,23 @@ export const useGameDetectionNotify = (games: Game[] | undefined): void => {
       return;
     }
 
-    const newGames = games.filter((game) => !knownGamesRef.current!.has(game.name));
+    const newGames = games.filter(
+      (game) => !knownGamesRef.current!.has(game.name),
+    );
     knownGamesRef.current = currentNames;
 
     if (newGames.length === 0) return;
 
     if (newGames.length === 1) {
-      notify(APP_NAME, t("notifications.gameDetectedOne", { name: newGames[0].name }));
+      notify(
+        APP_NAME,
+        t("notifications.gameDetectedOne", { name: newGames[0].name }),
+      );
     } else {
-      notify(APP_NAME, t("notifications.gameDetectedOther", { count: newGames.length }));
+      notify(
+        APP_NAME,
+        t("notifications.gameDetectedOther", { count: newGames.length }),
+      );
     }
   }, [games, t]);
 };
