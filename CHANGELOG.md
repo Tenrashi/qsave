@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/Tenrashi/qsave/compare/v1.8.0...v1.8.1) (2026-10-22)
+
+
+### Bug Fixes
+
+* **macos:** ad-hoc sign app bundle ([6dee187](https://github.com/Tenrashi/qsave/commit/6dee187ae6d1270bc184677bacc558ccd277b8b7))
+
 # [1.8.0](https://github.com/Tenrashi/qsave/compare/v1.7.3...v1.8.0) (2026-05-31)
 
 ### Features
