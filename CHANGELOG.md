@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/Tenrashi/qsave/compare/v1.8.1...v1.9.0) (2026-10-31)
+
+
+### Features
+
+* **landing:** prerender home page for search engines ([bc62687](https://github.com/Tenrashi/qsave/commit/bc626872a3abbdef864d17fdd96860d1ef562c86))
+
 ## [1.8.1](https://github.com/Tenrashi/qsave/compare/v1.8.0...v1.8.1) (2026-10-22)
 
 
