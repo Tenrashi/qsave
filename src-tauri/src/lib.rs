@@ -16,6 +16,10 @@ use tauri::{
     tray::TrayIconBuilder,
     Manager,
 };
+use tauri_plugin_autostart::ManagerExt;
+
+/// Passed by the login launch entry so QSave starts hidden in the tray.
+const MINIMIZED_ARG: &str = "--minimized";
 
 #[tauri::command]
 fn get_cached_games() -> Vec<DetectedGame> {
@@ -220,7 +224,7 @@ pub fn run() {
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
-            None,
+            Some(vec![MINIMIZED_ARG]),
         ))
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_shell::init())
@@ -263,6 +267,21 @@ pub fn run() {
                 })
                 .build(app)?;
 
+            // Re-register so launch entries created before MINIMIZED_ARG existed pick it up.
+            let autolaunch = app.autolaunch();
+            if autolaunch.is_enabled().unwrap_or(false) {
+                let _ = autolaunch.enable();
+            }
+
+            if std::env::args().any(|arg| arg == MINIMIZED_ARG) {
+                #[cfg(target_os = "macos")]
+                app.set_dock_visibility(false);
+                return Ok(());
+            }
+
+            let Some(window) = app.get_webview_window("main") else { return Ok(()) };
+            let _ = window.show();
+            let _ = window.set_focus();
             Ok(())
         })
         .on_window_event(|window, event| {
