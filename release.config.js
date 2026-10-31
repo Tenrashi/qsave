@@ -7,7 +7,13 @@ export default {
   ],
   tagFormat: "v${version}",
   plugins: [
-    "@semantic-release/commit-analyzer",
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        // The landing site deploys on its own; it shouldn't ship a new app version.
+        releaseRules: [{ scope: "landing", release: false }],
+      },
+    ],
     "@semantic-release/release-notes-generator",
     ["@semantic-release/changelog", { changelogFile: "CHANGELOG.md" }],
     ["@semantic-release/npm", { npmPublish: false }],
