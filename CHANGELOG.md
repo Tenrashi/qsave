@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/Tenrashi/qsave/compare/v1.9.0...v1.10.0) (2026-10-31)
+
+
+### Features
+
+* start minimized to tray when launched at login ([d2c8033](https://github.com/Tenrashi/qsave/commit/d2c8033605bc7658fbafc3f0e016215b8a51d6d9))
+
 # [1.9.0](https://github.com/Tenrashi/qsave/compare/v1.8.1...v1.9.0) (2026-10-31)
 
 
