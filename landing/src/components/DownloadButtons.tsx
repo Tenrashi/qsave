@@ -77,6 +77,10 @@ export const DownloadButtons = () => {
       <div className="flex flex-col items-center gap-3">
         <div className="h-12 w-56 animate-pulse rounded-lg bg-muted" />
         <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+        {/* The release is fetched client-side, so give the prerendered HTML a real download link. */}
+        <a href={releasesPageUrl} className="sr-only">
+          {t("downloads.downloadFromGitHub")}
+        </a>
       </div>
     );
   }

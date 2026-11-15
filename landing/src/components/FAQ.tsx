@@ -62,7 +62,10 @@ const Item = ({ qa, open, onToggle }: ItemProps) => {
           aria-hidden
         />
       </button>
-      {open && <div className="pb-5 text-muted-foreground">{qa.answer}</div>}
+      {/* Always rendered (hidden when closed) so the prerendered HTML carries the answers for crawlers. */}
+      <div hidden={!open} className="pb-5 text-muted-foreground">
+        {qa.answer}
+      </div>
     </div>
   );
 };
